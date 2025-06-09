@@ -132,9 +132,6 @@ export async function PATCH(req: Request, { params }: { params: { courseId: stri
         },
         data: {
           videoUrl: null,
-          // muxData: {
-          //   delete: true, // This will remove the muxData relation
-          // },
           isPublished: false,
         },
       })
@@ -190,7 +187,8 @@ export async function PATCH(req: Request, { params }: { params: { courseId: stri
   }
 }
 
-// ✅ Added GET handler to support axios.get from frontend
+// GET handler to support axios.get from frontend
+
 export async function GET(req: Request, { params }: { params: { courseId: string; chapterId: string } }) {
   try {
     const chapter = await db.chapter.findUnique({
@@ -199,7 +197,7 @@ export async function GET(req: Request, { params }: { params: { courseId: string
         courseId: params.courseId,
       },
       include: {
-        muxData: true, // ✅ Include muxData to access playbackId from frontend
+        muxData: true,//  Include muxData to access playbackId from frontend
       },
     })
 

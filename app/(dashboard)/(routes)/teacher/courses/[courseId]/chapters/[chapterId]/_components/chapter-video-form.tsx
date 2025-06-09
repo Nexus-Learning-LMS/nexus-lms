@@ -19,7 +19,7 @@ interface ChapterVideoFormProps {
 }
 
 const formSchema = z.object({
-  videoUrl: z.string().nullable(), // Allow null for removal
+  videoUrl: z.string().nullable(),
   assetId: z.string().optional().nullable(),
   playbackId: z.string().optional().nullable(),
 })
@@ -44,7 +44,6 @@ export const ChapterVideoForm = ({ initialData, courseId, chapterId }: ChapterVi
   // --- Upload and Polling Logic ---
 
   const pollMuxStatus = async (uploadId: string): Promise<{ assetId: string; playbackId: string }> => {
-    // ... (This function remains the same as before)
     return new Promise((resolve, reject) => {
       const interval = setInterval(async () => {
         try {
