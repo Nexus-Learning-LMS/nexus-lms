@@ -1,16 +1,16 @@
 'use client'
 
 import * as z from 'zod'
-import axios from 'axios'
+import axios, { CancelTokenSource } from 'axios'
 import MuxPlayer from '@mux/mux-player-react'
-import { Pencil, PlusCircle, Video } from 'lucide-react'
-import { useState } from 'react'
+import { PlusCircle, Trash, Video, X } from 'lucide-react'
+import { useState, useRef } from 'react'
 import toast from 'react-hot-toast'
 import { useRouter } from 'next/navigation'
 import { Chapter, MuxData } from '@prisma/client'
-import Image from 'next/image'
 
 import { Button } from '@/components/ui/button'
+import { Progress } from '@/components/ui/progress'
 
 interface ChapterVideoFormProps {
   initialData: Chapter & { muxData?: MuxData | null }
@@ -19,23 +19,32 @@ interface ChapterVideoFormProps {
 }
 
 const formSchema = z.object({
-  videoUrl: z.string().min(1),
-  assetId: z.string().optional(),
-  playbackId: z.string().optional(),
+  videoUrl: z.string().nullable(), // Allow null for removal
+  assetId: z.string().optional().nullable(),
+  playbackId: z.string().optional().nullable(),
 })
 
 export const ChapterVideoForm = ({ initialData, courseId, chapterId }: ChapterVideoFormProps) => {
+  const router = useRouter()
+
+  // State for UI control
   const [isEditing, setIsEditing] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const [uploadProgress, setUploadProgress] = useState(0)
   const [videoReady, setVideoReady] = useState(!!initialData.muxData?.playbackId)
+
+  // State for data
   const [playbackId, setPlaybackId] = useState(initialData.muxData?.playbackId || '')
+
+  // State for upload progress and cancellation
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const cancelTokenSourceRef = useRef<CancelTokenSource | null>(null)
 
   const toggleEdit = () => setIsEditing((current) => !current)
 
-  const router = useRouter()
+  // --- Upload and Polling Logic ---
 
   const pollMuxStatus = async (uploadId: string): Promise<{ assetId: string; playbackId: string }> => {
+    // ... (This function remains the same as before)
     return new Promise((resolve, reject) => {
       const interval = setInterval(async () => {
         try {
@@ -53,7 +62,7 @@ export const ChapterVideoForm = ({ initialData, courseId, chapterId }: ChapterVi
           console.error('Failed to poll Mux status', error)
           reject(error)
         }
-      }, 3000) // Poll every 3 seconds
+      }, 3000)
     })
   }
 
@@ -63,63 +72,65 @@ export const ChapterVideoForm = ({ initialData, courseId, chapterId }: ChapterVi
 
     setUploading(true)
     setUploadProgress(0)
-    const loadingToast = toast.loading('Uploading video...')
+    cancelTokenSourceRef.current = axios.CancelToken.source()
+
+    const loadingToast = toast.loading('1/3: Preparing upload...')
 
     try {
-      // Create upload URL from your API route
-      // Step 1: Get signed upload URL
-
       const res = await axios.post(`/api/mux/upload`)
-
       const { uploadUrl, uploadId } = res.data
 
-      // Upload file to Mux URL
-      // Step 2: Upload with progress tracking
       toast.loading('2/3: Uploading video...', { id: loadingToast })
       await axios.put(uploadUrl, file, {
-        headers: {
-          'Content-Type': file.type,
-        },
+        headers: { 'Content-Type': file.type },
         onUploadProgress: (progressEvent) => {
           const percent = Math.round((progressEvent.loaded * 100) / (progressEvent.total || 1))
           setUploadProgress(percent)
         },
+        cancelToken: cancelTokenSourceRef.current.token,
       })
 
-      // Step 3: Poll Mux until the video is processed and ready
       toast.loading('3/3: Processing video...', { id: loadingToast })
       const { assetId, playbackId } = await pollMuxStatus(uploadId)
 
-      // Store temporary URL (mux will process later)
-      // Step 4: Save the final Mux data to your database
       await onSubmit({
         videoUrl: `https://stream.mux.com/${playbackId}.m3u8`,
         assetId: assetId,
         playbackId: playbackId,
       })
-      toast.success('Video uploaded! Processing by Mux…')
+      toast.success('Video uploaded successfully!')
     } catch (error) {
-      toast.error('Upload failed')
+      if (axios.isCancel(error)) {
+        toast.error('Upload canceled.')
+      } else {
+        toast.error('Upload failed. Please try again.')
+      }
     } finally {
       toast.dismiss(loadingToast)
       setUploading(false)
       setUploadProgress(0)
+      cancelTokenSourceRef.current = null
     }
   }
 
+  const cancelUpload = () => {
+    if (cancelTokenSourceRef.current) {
+      cancelTokenSourceRef.current.cancel('Upload canceled by user.')
+      setIsEditing(false) // Exit editing mode on cancel
+    }
+  }
+
+  // --- Submit and Remove Logic ---
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      // The PATCH request now sends assetId and playbackId
       await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, values)
 
-      // Update the UI immediately with the new playbackId
       if (values.playbackId) {
-        setPlaybackId(values.playbackId);
-        setVideoReady(true);
+        setPlaybackId(values.playbackId)
+        setVideoReady(true)
       }
 
-  
-      toast.success('Chapter updated')
       toggleEdit()
       router.refresh()
     } catch {
@@ -127,65 +138,87 @@ export const ChapterVideoForm = ({ initialData, courseId, chapterId }: ChapterVi
     }
   }
 
+  const onRemove = async () => {
+    const removeToast = toast.loading('Removing video...')
+    try {
+      await axios.patch(`/api/courses/${courseId}/chapters/${chapterId}`, {
+        videoUrl: null,
+      })
+
+      setVideoReady(false)
+      setPlaybackId('')
+      toast.success('Video removed.')
+      router.refresh()
+    } catch (error) {
+      toast.error('Failed to remove video.')
+    } finally {
+      toast.dismiss(removeToast)
+    }
+  }
+
+  // --- JSX Rendering ---
+
   return (
     <div className="mt-6 border bg-slate-100 rounded-md p-4">
       <div className="font-medium flex items-center justify-between">
         Chapter video
-        <Button onClick={toggleEdit} variant="ghost">
-          {isEditing && <>Cancel</>}
-          {!isEditing && !initialData.videoUrl && (
-            <>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add a video
-            </>
-          )}
-          {!isEditing && initialData.videoUrl && (
-            <>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit video
-            </>
-          )}
-        </Button>
+        {/* --- DYNAMIC BUTTON LOGIC --- */}
+        {!uploading && (
+          <Button onClick={videoReady ? onRemove : toggleEdit} variant={videoReady ? 'destructive' : 'ghost'}>
+            {videoReady && (
+              <>
+                <Trash className="h-4 w-4 mr-2" />
+                Remove
+              </>
+            )}
+            {isEditing && !videoReady && <>Cancel</>}
+            {!isEditing && !videoReady && (
+              <>
+                <PlusCircle className="h-4 w-4 mr-2" />
+                Add a video
+              </>
+            )}
+          </Button>
+        )}
+        {uploading && (
+          <Button onClick={cancelUpload} variant="destructive">
+            <X className="h-4 w-4 mr-2" />
+            Cancel
+          </Button>
+        )}
       </div>
-      {/* <div className="relative aspect-video mt-2">
-        <MuxPlayer playbackId={playbackId} />
-      </div> */}
-      {/* Single MuxPlayer rendered only if videoReady */}
-      {videoReady ? (
-        <div className="relative aspect-video mt-2">
-          <MuxPlayer playbackId={playbackId} />
-        </div>
-      ) : (
-        // Show placeholder box with icon while video processing
-        <div className="flex items-center justify-center h-60 bg-slate-200 rounded-md mt-2">
-          <Video className="h-10 w-10 text-slate-500" />
-          <span className="ml-2 text-slate-600">Video processing...</span>
-        </div>
-      )}
-      {/* {!isEditing &&
-        (!videoReady ? (
-          <div className="flex items-center justify-center h-60 bg-slate-200 rounded-md">
-            <Video className="h-10 w-10 text-slate-500" />
-          </div>
-        ) : (
-          <div className="relative aspect-video mt-2">
+
+      {/* --- DYNAMIC CONTENT AREA --- */}
+      <div className="mt-4">
+        {videoReady ? (
+          <div className="relative aspect-video">
             <MuxPlayer playbackId={playbackId} />
           </div>
-        ))} */}
-      {isEditing && (
-        <div className="mt-4 space-y-2">
-
-          {/* <input type="file" accept="video/*" onChange={onUpload} disabled={uploading} /> */}
-          <input type="file" accept="video/*" onChange={onUpload} disabled={uploading} />
-          {uploading && <div className="text-sm text-muted-foreground">Uploading: {uploadProgress}%...</div>}
-          <div className="text-xs text-muted-foreground mt-4">Upload this chapter&apos;s video</div>
-        </div>
-      )}
-      {initialData.videoUrl && !isEditing && (
-        <div className="text-xs text-muted-foreground mt-2">
-          Videos can take a few minutes to process. Refresh the page if video does not appear.
-        </div>
-      )}
+        ) : isEditing ? (
+          <div>
+            <input
+              type="file"
+              id="video-upload"
+              accept="video/*"
+              onChange={onUpload}
+              disabled={uploading}
+              className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sky-50 file:text-sky-700 hover:file:bg-sky-100"
+            />
+            {uploading && (
+              <div className="mt-4">
+                <Progress value={uploadProgress} className="w-full" />
+                <p className="text-xs text-muted-foreground mt-2">Uploading: {uploadProgress}%</p>
+              </div>
+            )}
+            <div className="text-xs text-muted-foreground mt-4">Upload this chapter's video</div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-60 bg-slate-200 rounded-md">
+            <Video className="h-10 w-10 text-slate-500" />
+            <p className="ml-2 text-sm text-slate-500">Add a video for this chapter</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

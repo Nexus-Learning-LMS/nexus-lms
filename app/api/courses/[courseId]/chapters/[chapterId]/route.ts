@@ -87,7 +87,7 @@ export async function DELETE(req: Request, { params }: { params: { courseId: str
 export async function PATCH(req: Request, { params }: { params: { courseId: string; chapterId: string } }) {
   try {
     const { userId } = await auth()
-    const { isPublished, playbackId, assetId, ...values } = await req.json()
+    const { isPublished, playbackId, assetId, videoUrl, ...values } = await req.json()
 
     if (!userId) {
       return new NextResponse('Unauthorized', { status: 401 })
@@ -104,54 +104,86 @@ export async function PATCH(req: Request, { params }: { params: { courseId: stri
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    // If assetId is provided, fetch the latest playbackId from Mux API
-    let finalPlaybackId = playbackId
-    if (assetId) {
-      // Fetch full asset details from Mux
-      const asset = await Video.Assets.get(assetId)
+    if (videoUrl === null) {
+      const chapter = await db.chapter.findUnique({
+        where: { id: params.chapterId, courseId: params.courseId },
+      })
 
-      // Find the public playback ID from Mux asset playback_ids
-      const publicPlaybackId = asset.playback_ids?.find((p: any) => p.policy === 'public')?.id
-
-      if (!publicPlaybackId) {
-        throw new Error('No public playback ID found for asset ' + assetId)
+      if (!chapter) {
+        return new NextResponse('Chapter not found', { status: 404 })
       }
 
-      finalPlaybackId = publicPlaybackId
-
-      // Delete existing muxData if any
       const existingMuxData = await db.muxData.findFirst({
         where: { chapterId: params.chapterId },
       })
+
       if (existingMuxData) {
+        // Delete the Mux asset if it exists
         await Video.Assets.del(existingMuxData.assetId)
+        // Delete the muxData record
         await db.muxData.delete({ where: { id: existingMuxData.id } })
       }
 
-      // Save muxData with the correct assetId and playbackId from Mux API
-      await db.muxData.create({
+      // Update chapter to remove videoUrl and muxData
+      const updatedChapter = await db.chapter.update({
+        where: {
+          id: params.chapterId,
+          courseId: params.courseId,
+        },
         data: {
-          chapterId: params.chapterId,
-          assetId,
-          playbackId: finalPlaybackId,
+          videoUrl: null,
+          // muxData: {
+          //   delete: true, // This will remove the muxData relation
+          // },
+          isPublished: false,
         },
       })
+      return NextResponse.json(updatedChapter)
     }
 
-    // Update chapter with new values and videoUrl based on finalPlaybackId
-    const updatedChapter = await db.chapter.update({
+    // logic for adding/ updating a video
+    const chapter = await db.chapter.update({
       where: {
         id: params.chapterId,
         courseId: params.courseId,
       },
       data: {
         ...values,
-        videoUrl: finalPlaybackId ? `https://stream.mux.com/${finalPlaybackId}.m3u8` : '',
-        isPublished,
+        videoUrl, //videoUrl is passed directly now
       },
     })
 
-    return NextResponse.json(updatedChapter)
+    if (values.assetId && values.playbackId) {
+      const existingMuxData = await db.muxData.findFirst({
+        where: { chapterId: params.chapterId },
+      })
+
+      if (existingMuxData) {
+        // this logic prevents re-deleting a new asset if you are just updating text fields.
+        if (existingMuxData.assetId !== values.assetId) {
+          // Delete the existing Mux asset
+          await Video.Assets.del(existingMuxData.assetId)
+          // Delete the existing muxData record
+          await db.muxData.delete({ where: { id: existingMuxData.id } })
+        }
+      }
+
+      //Ensure muxData is only created if it doesnt already exist for the asset
+      const muxDataExists = await db.muxData.findFirst({
+        where: { assetId: values.assetId },
+      })
+
+      if (!muxDataExists) {
+        await db.muxData.create({
+          data: {
+            chapterId: params.chapterId,
+            assetId: values.assetId,
+            playbackId: values.playbackId,
+          },
+        })
+      }
+    }
+    return NextResponse.json(chapter)
   } catch (error) {
     console.log('[COURSES_CHAPTER_ID]', error)
     return new NextResponse('Internal Error', { status: 500 })
