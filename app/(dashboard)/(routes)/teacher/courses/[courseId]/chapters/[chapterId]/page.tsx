@@ -5,13 +5,13 @@ import { ArrowLeft, Eye, LayoutDashboard, Video } from 'lucide-react'
 
 import { db } from '@/lib/db'
 import { IconBadge } from '@/components/icon-badge'
-// import { Banner } from '@/components/banner'
+import { Banner } from '@/components/banner'
 
 import { ChapterTitleForm } from './_components/chapter-title-form'
 import { ChapterDescriptionForm } from './_components/chapter-description-form'
 import { ChapterAccessForm } from './_components/chapter-access-form'
 import { ChapterVideoForm } from './_components/chapter-video-form'
-// import { ChapterActions } from './_components/chapter-actions'
+import { ChapterActions } from './_components/chapter-actions'
 
 const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId: string } }) => {
   const { userId } = await auth()
@@ -43,11 +43,32 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
 
   const isComplete = requiredFields.every(Boolean)
 
+
+  // // 1. Define the fields required for the UI completion text.
+  // //    These are the fields the user can directly edit.
+  // const uiRequiredFields = [chapter.title, chapter.description, chapter.videoUrl]
+
+  // // 2. Define the fields ACTUALLY required for the publish action to be enabled.
+  // //    This includes the programmatic field, muxData.
+  // const functionalRequiredFields = [
+  //   ...uiRequiredFields, // Includes title, description, videoUrl
+  //   chapter.muxData,
+  // ]
+
+  // // 3. Calculate the UI completion text based ONLY on the UI fields.
+  // const totalUiFields = uiRequiredFields.length
+  // const completedUiFields = uiRequiredFields.filter(Boolean).length
+  // const completionText = `(${completedUiFields}/${totalUiFields})`
+
+  // // 4. Calculate the TRUE completeness for the button's disabled state.
+  // const isComplete = functionalRequiredFields.every(Boolean)
+
+
   return (
     <>
-      {/* {!chapter.isPublished && (
+      {!chapter.isPublished && (
         <Banner variant="warning" label="This chapter is unpublished. It will not be visible in the course" />
-      )} */}
+      )}
       <div className="p-6">
         <div className="flex items-center justify-between">
           <div className="w-full">
@@ -63,12 +84,12 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
                 <h1 className="text-2xl font-medium">Chapter Creation</h1>
                 <span className="text-sm text-slate-700">Complete all fields {completionText}</span>
               </div>
-              {/* <ChapterActions
+              <ChapterActions
                 disabled={!isComplete}
                 courseId={params.courseId}
                 chapterId={params.chapterId}
                 isPublished={chapter.isPublished}
-              /> */}
+              />
             </div>
           </div>
         </div>
