@@ -150,14 +150,14 @@ export async function PATCH(req: Request, { params }: { params: { courseId: stri
       },
     })
 
-    if (values.assetId && values.playbackId) {
+    if (assetId && playbackId) {
       const existingMuxData = await db.muxData.findFirst({
         where: { chapterId: params.chapterId },
       })
 
       if (existingMuxData) {
         // this logic prevents re-deleting a new asset if you are just updating text fields.
-        if (existingMuxData.assetId !== values.assetId) {
+        if (existingMuxData.assetId !== assetId) {
           // Delete the existing Mux asset
           await Video.Assets.del(existingMuxData.assetId)
           // Delete the existing muxData record
@@ -167,15 +167,15 @@ export async function PATCH(req: Request, { params }: { params: { courseId: stri
 
       //Ensure muxData is only created if it doesnt already exist for the asset
       const muxDataExists = await db.muxData.findFirst({
-        where: { assetId: values.assetId },
+        where: { assetId: assetId },
       })
 
       if (!muxDataExists) {
         await db.muxData.create({
           data: {
             chapterId: params.chapterId,
-            assetId: values.assetId,
-            playbackId: values.playbackId,
+            assetId: assetId,
+            playbackId: playbackId,
           },
         })
       }
@@ -197,7 +197,7 @@ export async function GET(req: Request, { params }: { params: { courseId: string
         courseId: params.courseId,
       },
       include: {
-        muxData: true,//  Include muxData to access playbackId from frontend
+        muxData: true, //  Include muxData to access playbackId from frontend
       },
     })
 
