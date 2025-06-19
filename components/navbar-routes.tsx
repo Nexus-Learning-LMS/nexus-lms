@@ -21,12 +21,12 @@ const guestRoutes = [
   {
     icon: Compass,
     label: 'Our Team',
-    href: '/team',
+    href: '/#team',
   },
   {
     icon: Compass,
     label: 'Why Nexus?',
-    href: '/why-nexus',
+    href: '/#why-nexus',
   },
   {
     icon: User,
