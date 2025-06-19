@@ -106,7 +106,7 @@ export default async function Home() {
       </section>
 
       {/* Our Courses Section */}
-      <section className="py-16 md:py-24 bg-brand-light-gray/50">
+      <section className="py-16 md:py-20 bg-brand-light-gray/50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-brand-dark-blue">Our Featured Courses</h2>
@@ -138,7 +138,7 @@ export default async function Home() {
       </section>
 
       {/* Why Nexus Section */}
-      <section id="why-nexus" className="py-16 md:py-16 bg-white">
+      <section id="why-nexus" className="py-16 md:py-20 bg-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-brand-dark-blue">Why Nexus Learning?</h2>

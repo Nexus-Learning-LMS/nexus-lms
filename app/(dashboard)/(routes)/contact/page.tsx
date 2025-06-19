@@ -7,9 +7,10 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import toast from 'react-hot-toast'
 import { Course } from '@prisma/client'
+import { Send } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { MultiSelect, Framework } from '@/components/ui/multi-select'
@@ -28,65 +29,25 @@ const formSchema = z.object({
 // --- Main Page Component ---
 const ContactPage = () => {
   const [courses, setCourses] = useState<Framework[]>([])
+  const [isFetchingCourses, setIsFetchingCourses] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
 
-  // Fetch all published courses when the component mounts
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        // NOTE: In a real app, you would create a dedicated public API route
-        // to fetch only published course titles and IDs. For now, we assume a placeholder.
-        // This is a placeholder for where you would get the data.
-        // For a real implementation, you'd need an API endpoint.
-        const mockCourses: Course[] = [
-          {
-            id: 'course_1',
-            title: 'Introduction to Next.js',
-            userId: '',
-            description: null,
-            imageUrl: null,
-            price: null,
-            isPublished: true,
-            categoryId: null,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          {
-            id: 'course_2',
-            title: 'Advanced Prisma Techniques',
-            userId: '',
-            description: null,
-            imageUrl: null,
-            price: null,
-            isPublished: true,
-            categoryId: null,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-          {
-            id: 'course_3',
-            title: 'Mastering Shadcn UI',
-            userId: '',
-            description: null,
-            imageUrl: null,
-            price: null,
-            isPublished: true,
-            categoryId: null,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ]
-
-        const formattedCourses = mockCourses.map((course) => ({
+        setIsFetchingCourses(true)
+        const response = await axios.get('/api/public/courses')
+        const formattedCourses = response.data.map((course: Course) => ({
           value: course.id,
           label: course.title,
         }))
         setCourses(formattedCourses)
       } catch (error) {
         toast.error('Could not load course list.')
+      } finally {
+        setIsFetchingCourses(false)
       }
     }
-
     fetchCourses()
   }, [])
 
@@ -116,88 +77,116 @@ const ContactPage = () => {
 
   // --- JSX Rendering ---
   return (
-    <div className="max-w-2xl mx-auto p-4 md:p-8">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold">Enroll Now</h1>
-        <p className="text-muted-foreground mt-2">
-          Fill out the form below to start your learning journey. We'll contact you to complete the enrollment.
+    <>
+      {/* Blue Header Section */}
+      <div className="w-full bg-brand-primary-blue p-8 md:p-12 text-center">
+        <h1 className="text-3xl md:text-4xl font-bold text-white">Get In Touch</h1>
+        <p className="text-slate-200 mt-2 max-w-2xl mx-auto">
+          Fill out the form below to start your learning journey. We'll contact you to complete the enrollment process.
         </p>
       </div>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="John Doe" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email Address</FormLabel>
-                <FormControl>
-                  <Input placeholder="you@example.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>WhatsApp Phone Number</FormLabel>
-                <FormControl>
-                  <Input placeholder="+1 234 567 890" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="courses"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Course/s of Interest</FormLabel>
-                <MultiSelect options={courses} selected={field.value} onChange={field.onChange} className="w-full" />
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="remarks"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Remarks (Optional)</FormLabel>
-                <FormControl>
-                  <Textarea
-                    placeholder="Tell us anything else you'd like us to know."
-                    className="resize-none"
-                    {...field}
+
+      {/* Form Section */}
+      <div className="max-w-2xl mx-auto p-4 md:p-8">
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold text-brand-deep-blue">Full Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="John Doe"
+                      {...field}
+                      className="h-12 focus:border-brand-primary-blue focus:ring-2 focus:ring-brand-primary-blue/20"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold text-brand-deep-blue">Email Address</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="you@example.com"
+                      {...field}
+                      className="h-12 focus:border-brand-primary-blue focus:ring-2 focus:ring-brand-primary-blue/20"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold text-brand-deep-blue">WhatsApp Phone Number</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="+1 234 567 890"
+                      {...field}
+                      className="h-12 focus:border-brand-primary-blue focus:ring-2 focus:ring-brand-primary-blue/20"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="courses"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold text-brand-deep-blue">Course/s of Interest</FormLabel>
+                  <MultiSelect
+                    options={courses}
+                    selected={field.value}
+                    onChange={field.onChange}
+                    className="w-full "
+                    placeholder={isFetchingCourses ? 'Loading courses...' : 'Select courses...'}
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" disabled={isLoading} className="w-full">
-            Submit Inquiry
-          </Button>
-        </form>
-      </Form>
-    </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="remarks"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="font-semibold text-brand-deep-blue">Remarks (Optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Tell us anything else you'd like us to know."
+                      className="resize-none min-h-[8rem] focus:border-brand-primary-blue focus:ring-2 focus:ring-brand-primary-blue/20"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              disabled={isLoading || isFetchingCourses}
+              className="w-full bg-brand-primary-blue hover:bg-brand-dark-blue py-6 text-lg text-white"
+            >
+              Submit Inquiry
+              <Send className="h-5 w-5 ml-2" />
+            </Button>
+          </form>
+        </Form>
+      </div>
+    </>
   )
 }
 
