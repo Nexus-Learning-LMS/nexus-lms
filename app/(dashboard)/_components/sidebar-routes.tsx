@@ -1,6 +1,6 @@
 'use client'
 
-import { BarChart, Compass, Layout, List } from 'lucide-react'
+import { BarChart, Compass, Layout, List, User } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 
 import { SidebarItem } from './sidebar-item'
@@ -8,13 +8,28 @@ import { SidebarItem } from './sidebar-item'
 const guestRoutes = [
   {
     icon: Layout,
-    label: 'Dashboard',
+    label: 'Home',
     href: '/',
   },
   {
     icon: Compass,
-    label: 'Browse',
+    label: 'Our Courses',
     href: '/search',
+  },
+  {
+    icon: Compass,
+    label: 'Our Team',
+    href: '/team',
+  },
+  {
+    icon: Compass,
+    label: 'Why Nexus?',
+    href: '/why-nexus',
+  },
+  {
+    icon: User,
+    label: 'Contact Us',
+    href: '/contact',
   },
 ]
 

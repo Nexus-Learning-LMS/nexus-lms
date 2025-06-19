@@ -41,8 +41,10 @@ export const CategoryItem = ({ label, value, icon: Icon }: CategoryItemProps) =>
     <button
       onClick={onClick}
       className={cn(
-        'py-2 px-3 text-sm border border-slate-200 rounded-full flex items-center gap-x-1 hover:border-sky-700 transition',
-        isSelected && 'border-sky-700 bg-sky-200/20 text-sky-800',
+        'py-2 px-4 text-sm border-2 bg-white border-slate-200 rounded-full flex items-center gap-x-1 hover:border-brand-primary-blue/50 transition-all duration-300',
+        // Updated selected state to use solid blue background with white text
+        isSelected &&
+          'border-brand-primary-blue bg-brand-primary-blue text-white hover:bg-brand-dark-blue hover:border-brand-dark-blue',
       )}
       type="button"
     >
