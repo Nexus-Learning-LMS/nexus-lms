@@ -8,21 +8,22 @@ import axios from 'axios'
 import toast from 'react-hot-toast'
 import { Course } from '@prisma/client'
 import { Send } from 'lucide-react'
+import PhoneInput, { isValidPhoneNumber } from 'react-phone-number-input'
+import 'react-phone-number-input/style.css'
 
 import { Button } from '@/components/ui/button'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { MultiSelect, Framework } from '@/components/ui/multi-select'
+import { cn } from '@/lib/utils'
 
 // --- Form Schema with Zod ---
 const formSchema = z.object({
-  name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
+  name: z.string().min(2, { message: 'Name is required.' }),
   email: z.string().email({ message: 'Please enter a valid email address.' }),
-  phone: z.string().min(10, { message: 'Please enter a valid phone number.' }),
-  courses: z.array(z.string()).refine((value) => value.some((item) => item), {
-    message: 'You have to select at least one course.',
-  }),
+  phone: z.string().refine(isValidPhoneNumber, { message: 'Please enter a valid phone number.' }),
+  courses: z.array(z.string()),
   remarks: z.string().optional(),
 })
 
@@ -133,7 +134,7 @@ const ContactPage = () => {
                       className="h-12 focus:border-brand-primary-blue focus:ring-2 focus:ring-brand-primary-blue/20"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 font-light" />
                 </FormItem>
               )}
             />
@@ -150,7 +151,7 @@ const ContactPage = () => {
                       className="h-12 focus:border-brand-primary-blue focus:ring-2 focus:ring-brand-primary-blue/20"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 font-light" />
                 </FormItem>
               )}
             />
@@ -161,13 +162,18 @@ const ContactPage = () => {
                 <FormItem>
                   <FormLabel className="font-semibold text-brand-deep-blue">WhatsApp Phone Number</FormLabel>
                   <FormControl>
-                    <Input
-                      placeholder="+1 234 567 890"
+                    <PhoneInput
+                      international
+                      defaultCountry="IN"
+                      placeholder="Enter phone number"
                       {...field}
-                      className="h-12 focus:border-brand-primary-blue focus:ring-2 focus:ring-brand-primary-blue/20"
+                      className={cn(
+                        'flex h-12 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50',
+                        'focus:border-brand-primary-blue focus:ring-2 focus:ring-brand-primary-blue/20',
+                      )}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 font-light" />
                 </FormItem>
               )}
             />
@@ -184,7 +190,7 @@ const ContactPage = () => {
                     className="w-full "
                     placeholder={isFetchingCourses ? 'Loading courses...' : 'Select courses...'}
                   />
-                  <FormMessage />
+                  <FormMessage className="text-red-500 font-light" />
                 </FormItem>
               )}
             />
@@ -201,7 +207,7 @@ const ContactPage = () => {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-500 font-light" />
                 </FormItem>
               )}
             />
