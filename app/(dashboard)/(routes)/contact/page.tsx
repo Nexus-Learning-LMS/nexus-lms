@@ -64,15 +64,45 @@ const ContactPage = () => {
   })
 
   // --- Submit Handler ---
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // For now, we just log the data. In Phase 2, we will send this to our API.
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
-    console.log('Form Submitted:', values)
-    toast.success('Inquiry received! We will contact you shortly.')
-    // In a real scenario:
-    // await axios.post('/api/enrollment-request', values);
-    form.reset()
-    setIsLoading(false)
+    try {
+      const selectedCourseTitles = values.courses
+        .map((courseId) => {
+          return courses.find((course) => course.value === courseId)?.label || courseId
+        })
+        .join(', ')
+
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY,
+          subject: `New Course Inquiry from ${values.name}`,
+          from_name: 'Nexus Learning',
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          courses: selectedCourseTitles,
+          remarks: values.remarks,
+        }),
+      })
+
+      const result = await response.json()
+      if (result.success) {
+        toast.success('Inquiry received! We will contact you shortly.')
+        form.reset()
+      } else {
+        throw new Error(result.message || 'Failed to send inquiry.')
+      }
+    } catch (error) {
+      toast.error('Something went wrong. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   // --- JSX Rendering ---
