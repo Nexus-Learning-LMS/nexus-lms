@@ -74,7 +74,7 @@ function MultiSelect({ options, selected, onChange, className, placeholder, ...p
           <CommandInput placeholder="Search courses..." />
           <CommandList>
             <CommandEmpty>No courses found.</CommandEmpty>
-            <CommandGroup>
+            <CommandGroup className="max-h-[150px] overflow-y-auto">
               {options.map((option) => (
                 <CommandItem
                   key={option.value}
