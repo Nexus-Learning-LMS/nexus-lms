@@ -31,7 +31,7 @@ interface FoundUser {
 }
 
 export const EnrollmentClient = () => {
-  const [phone, setPhone] = useState('')
+  const [email, setEmail] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [foundUser, setFoundUser] = useState<FoundUser | null>(null)
 
@@ -43,18 +43,18 @@ export const EnrollmentClient = () => {
   } | null>(null)
 
   const handleSearch = async () => {
-    if (!phone) {
-      toast.error("Please enter a user's phone number.")
+    if (!email) {
+      toast.error("Please enter a user's email address.")
       return
     }
-    if (phone.includes('+')) {
-      toast.error('Please enter the phone number without the country code.')
+    if (!email.includes('@')) {
+      toast.error('Please enter a valid email address.')
       return
     }
     setIsLoading(true)
     setFoundUser(null)
     try {
-      const response = await axios.get(`/api/users?phone=${phone}`)
+      const response = await axios.get(`/api/users?email=${email}`)
       setFoundUser(response.data)
     } catch (error) {
       toast.error('User not found or an error occurred.')
@@ -94,18 +94,13 @@ export const EnrollmentClient = () => {
       {/* STEP 1: FIND USER */}
       <div className="p-6 border rounded-lg bg-slate-50">
         <h2 className="text-lg font-semibold text-brand-deep-blue mb-4">Step 1: Find User</h2>
-        <p className="text-sm text-slate-600 mb-4">
-          Start by finding their account by phone number. (without country code)
-        </p>
+        <p className="text-sm text-slate-600 mb-4">Start by finding their account by email</p>
         <div className="flex flex-col sm:flex-row gap-2">
           <Input
-            value={phone}
-            onChange={(e) => {
-              const numericValue = e.target.value.replace(/\D/g, '')
-              setPhone(numericValue)
-            }}
-            type="tel"
-            placeholder="Enter user's phone number (e.g., 9876543210)"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            type="email"
+            placeholder="Enter user's email address"
             className="h-12"
             disabled={isLoading}
           />

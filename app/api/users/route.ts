@@ -4,22 +4,19 @@ import { db } from '@/lib/db'
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url)
-    const phone = searchParams.get('phone')
+    const email = searchParams.get('email')
 
-    if (!phone) {
-      return new NextResponse('Phone number is required', { status: 400 })
+    if (!email) {
+      return new NextResponse('Email is required', { status: 400 })
     }
 
-    // --- START OF FIX ---
-    // First, try a strict search using the provided phone number.
     const clerk = await clerkClient()
-    let usersResponse = await clerk.users.getUserList({ phoneNumber: [phone] })
+    const usersResponse = await clerk.users.getUserList({ emailAddress: [email] })
 
     // If the strict search finds no users, try a more lenient 'query' search as a fallback.
     if (usersResponse.totalCount === 0) {
-      usersResponse = await clerk.users.getUserList({ query: phone })
+      const usersResponse = await clerk.users.getUserList({ emailAddress: [email] })
     }
-    // --- END OF FIX ---
 
     if (usersResponse.totalCount === 0) {
       return new NextResponse('User not found', { status: 404 })
