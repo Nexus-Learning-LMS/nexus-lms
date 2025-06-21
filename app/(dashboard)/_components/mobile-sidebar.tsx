@@ -55,7 +55,7 @@ export const MobileSidebar = () => {
           <Menu className="text-brand-deep-blue" />
         </SheetTrigger>
       )}
-      <SheetContent side="left" className="p-0 bg-brand-deep-blue text-white">
+      <SheetContent side="left" className="p-0 bg-brand-deep-blue text-white data-[state=open]:duration-300">
         <SheetTitle className="sr-only">Sidebar Menu</SheetTitle>
         <div className="h-full flex flex-col">
           <div className="p-6 border-b border-white/20">
