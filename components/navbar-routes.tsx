@@ -3,7 +3,7 @@
 import { UserButton, useAuth } from '@clerk/nextjs'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { LogOut, Compass, Layout, User } from 'lucide-react'
+import { LogOut, Compass, Layout, User, List, BarChart } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 
@@ -35,6 +35,11 @@ const guestRoutes = [
   },
 ]
 
+const teacherRoutes = [
+  { icon: List, label: 'Courses', href: '/teacher/courses' },
+  { icon: BarChart, label: 'Analytics', href: '/teacher/analytics' },
+]
+
 export const NavbarRoutes = () => {
   const { userId, sessionClaims } = useAuth()
   const pathname = usePathname()
@@ -44,6 +49,8 @@ export const NavbarRoutes = () => {
 
   const isTeacherPage = pathname?.startsWith('/teacher')
   const isCoursePage = pathname?.includes('/courses')
+
+  const routes = isTeacherPage ? teacherRoutes : guestRoutes
 
   // Helper component for a single navigation link with updated styles
   const NavLink = ({ href, label }: { href: string; label: string }) => {
@@ -73,7 +80,7 @@ export const NavbarRoutes = () => {
       <div className=""></div> {/* Invisible spacer to balance the logo width */}
       {/* Middle Navigation Links (Desktop Only) */}
       <div className="hidden md:flex gap-x-6 mx-auto">
-        {guestRoutes.map((route) => (
+        {routes.map((route) => (
           <NavLink key={route.href} href={route.href} label={route.label} />
         ))}
       </div>
