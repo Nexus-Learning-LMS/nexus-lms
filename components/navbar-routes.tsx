@@ -3,7 +3,7 @@
 import { UserButton, useAuth } from '@clerk/nextjs'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { LogOut, Compass, Layout, User, List, BarChart } from 'lucide-react'
+import { LogOut, Compass, Layout, User, List, BarChart, BookUser } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 
@@ -38,6 +38,7 @@ const guestRoutes = [
 const teacherRoutes = [
   { icon: List, label: 'Courses', href: '/teacher/courses' },
   { icon: BarChart, label: 'Analytics', href: '/teacher/analytics' },
+  { icon: BookUser, label: 'User Enrollments', href: '/teacher/enrollments' },
 ]
 
 export const NavbarRoutes = () => {

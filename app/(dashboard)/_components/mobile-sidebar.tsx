@@ -1,6 +1,6 @@
 'use client'
 
-import { Menu, Layout, Compass, User, Award, Users, List, BarChart } from 'lucide-react'
+import { Menu, Layout, Compass, User, Award, Users, List, BarChart, BookUser } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useState, useEffect } from 'react'
@@ -20,6 +20,7 @@ const mobileRoutes = [
 const teacherMobileRoutes = [
   { href: '/teacher/courses', label: 'Courses', icon: List },
   { href: '/teacher/analytics', label: 'Analytics', icon: BarChart },
+  { href: '/teacher/enrollments', label: 'User Enrollments', icon: BookUser },
 ]
 
 export const MobileSidebar = () => {
