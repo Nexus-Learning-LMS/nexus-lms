@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
-import { File, Lock } from 'lucide-react'
+import { File, Link, Lock } from 'lucide-react'
 
 import { getChapter } from '@/actions/get-chapter'
 import { Banner } from '@/components/banner'
@@ -42,7 +42,7 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
             title={chapter.title}
             courseId={params.courseId}
             nextChapterId={nextChapter?.id}
-            playbackId={muxData.playbackId} // The '!' is removed as we've confirmed it exists
+            playbackId={muxData.playbackId}
             isLocked={isLocked}
             completeOnEnd={completeOnEnd}
           />
@@ -50,29 +50,24 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
           // If the chapter is locked, show the locked screen.
           // Otherwise, show a "video not found" message, which is better UX than infinite buffering.
           <div className="relative aspect-video">
-            <div className="absolute inset-0 flex items-center justify-center bg-slate-800 flex-col gap-y-2 text-secondary">
+            <div className="absolute inset-0 flex items-center justify-center bg-slate-800 text-white flex-col gap-y-2">
               {isLocked ? (
                 <>
                   <Lock className="h-8 w-8" />
                   <p className="text-sm">This chapter is locked</p>
                 </>
               ) : (
-                <p className="text-sm">This video is not available or is still processing.</p>
+                <p className="text-sm text-center">
+                  This video is not available or is still processing. Please reach out to{' '}
+                  <a href="/contact" className=" text-blue-400 underline hover:text-brand-dark-blue transition">
+                    Nexus Learning Support
+                  </a>{' '}
+                  if the issue persists.
+                </p>
               )}
             </div>
           </div>
         )}
-        {/* <div className="p-4">
-          <VideoPlayer
-            chapterId={params.chapterId}
-            title={chapter.title}
-            courseId={params.courseId}
-            nextChapterId={nextChapter?.id}
-            playbackId={muxData?.playbackId!}
-            isLocked={isLocked}
-            completeOnEnd={completeOnEnd}
-          />
-        </div> */}
         <div>
           <div className="p-4 flex flex-col md:flex-row items-center justify-between">
             <h2 className="text-2xl font-semibold mb-2">{chapter.title}</h2>
@@ -84,7 +79,7 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
                 isCompleted={!!userProgress?.isCompleted}
               />
             ) : (
-              <CourseEnrollButton courseId={params.courseId} price={course.price!} />
+              <CourseEnrollButton />
             )}
           </div>
           <Separator />

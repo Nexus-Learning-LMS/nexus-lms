@@ -1,45 +1,25 @@
-"use client";
+'use client'
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { useState } from 'react'
+import { Loader2 } from 'lucide-react'
 
-import axios from "axios";
-import { useState } from "react";
-import toast from "react-hot-toast";
+export const CourseEnrollButton = () => {
+  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter()
 
-import { Button } from "@/components/ui/button";
-import { formatPrice } from "@/lib/format";
-
-interface CourseEnrollButtonProps {
-  price: number;
-  courseId: string;
-}
-
-export const CourseEnrollButton = ({
-  price,
-  courseId,
-}: CourseEnrollButtonProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const onClick = async () => {
-    try {
-      setIsLoading(true);
-
-      const response = await axios.post(`/api/courses/${courseId}/checkout`)
-
-      window.location.assign(response.data.url);
-    } catch {
-      toast.error("Something went wrong");
-    } finally {
-      setIsLoading(false);
-    }
+  const onClick = () => {
+    setIsLoading(true)
+    router.push('/contact')
   }
-
   return (
     <Button
       onClick={onClick}
       disabled={isLoading}
       size="sm"
-      className="w-full md:w-auto"
+      className="w-full md:w-auto bg-brand-dark-blue text-white hover:text-black focus:bg-brand-deep-blue focus:text-white"
     >
-      Enroll for {formatPrice(price)}
+      {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Enroll Now'}
     </Button>
   )
 }
