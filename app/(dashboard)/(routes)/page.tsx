@@ -8,6 +8,8 @@ import { ArrowRight, Award, ClipboardCheck, HeartHandshake, PlayCircle, Users } 
 
 import { db } from '@/lib/db'
 import { CourseCard } from '@/components/course-card'
+import { auth } from '@clerk/nextjs/server'
+import { getProgress } from '@/actions/get-progress'
 
 // The features for the "Why Nexus?" section
 const features = [
@@ -44,6 +46,8 @@ const features = [
 ]
 
 export default async function Home() {
+  const { userId } = await auth()
+
   // Fetch the 4 most recent published courses to display
   const courses = await db.course.findMany({
     where: {
@@ -55,12 +59,37 @@ export default async function Home() {
         where: { isPublished: true },
         select: { id: true },
       },
+      purchases: userId
+        ? {
+            where: {
+              userId,
+            },
+          }
+        : false,
     },
     orderBy: {
       createdAt: 'desc',
     },
     take: 4,
   })
+
+  const coursesWithProgress = userId
+    ? await Promise.all(
+        courses.map(async (course) => {
+          if (course.purchases.length > 0) {
+            const progressPercentage = await getProgress(userId, course.id)
+            return {
+              ...course,
+              progress: progressPercentage,
+            }
+          }
+          return {
+            ...course,
+            progress: null,
+          }
+        }),
+      )
+    : courses.map((course) => ({ ...course, progress: null }))
 
   return (
     <div>
@@ -113,7 +142,7 @@ export default async function Home() {
             <p className="text-slate-500 mt-2">Get started with our most popular learning paths.</p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {courses.map((course) => (
+            {coursesWithProgress.map((course) => (
               <CourseCard
                 key={course.id}
                 id={course.id}
@@ -121,8 +150,9 @@ export default async function Home() {
                 imageUrl={course.imageUrl!}
                 chaptersLength={course.chapters.length}
                 price={course.price!}
-                progress={null} // No progress for public view
+                progress={course.progress}
                 category={course.category?.name!}
+                isPurchased={course.purchases && course.purchases.length > 0}
               />
             ))}
           </div>

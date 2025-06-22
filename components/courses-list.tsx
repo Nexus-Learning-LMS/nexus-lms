@@ -7,6 +7,7 @@ type CourseWithProgressWithCategory = Course & {
   category: Category | null
   chapters: { id: string }[]
   progress: number | null
+  purchases: { id: string }[]
 }
 
 interface CoursesListProps {
@@ -27,6 +28,7 @@ export const CoursesList = ({ items }: CoursesListProps) => {
             price={item.price!}
             progress={item.progress}
             category={item?.category?.name!}
+            isPurchased={item.purchases.length > 0}
           />
         ))}
       </div>

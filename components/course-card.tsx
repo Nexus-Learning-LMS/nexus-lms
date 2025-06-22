@@ -16,9 +16,19 @@ interface CourseCardProps {
   price: number
   progress: number | null
   category: string
+  isPurchased: boolean
 }
 
-export const CourseCard = ({ id, title, imageUrl, chaptersLength, price, progress, category }: CourseCardProps) => {
+export const CourseCard = ({
+  id,
+  title,
+  imageUrl,
+  chaptersLength,
+  price,
+  progress,
+  category,
+  isPurchased,
+}: CourseCardProps) => {
   const router = useRouter()
   const handleContactClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault()
@@ -47,26 +57,24 @@ export const CourseCard = ({ id, title, imageUrl, chaptersLength, price, progres
           </div>
 
           <div className="flex-grow" />
-
-          {progress !== null ? (
-            <CourseProgress variant={progress === 100 ? 'success' : 'default'} size="sm" value={progress} />
+          {isPurchased ? (
+            progress !== null && progress > 0 ? (
+              <CourseProgress variant={progress === 100 ? 'success' : 'default'} value={progress} />
+            ) : (
+              <p className="text-base font-semibold text-green-700">Ready to Start</p>
+            )
           ) : (
-            // The button is now a proper <button> element with an onClick handler
             <button
               onClick={handleContactClick}
               className="relative inline-flex items-center justify-center px-6 py-2 overflow-hidden font-medium text-white transition duration-300 ease-out border-2 border-slate-500 rounded-md group-hover:border-white w-full"
               type="button"
             >
-              {/* This span slides in from the left on hover */}
-              <span className="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 bg-brand-primary-blue -translate-x-full  group-hover:translate-x-0 ease">
-                {/* Replaced SVG with text */}
+              <span className="absolute inset-0 flex items-center justify-center w-full h-full text-white duration-300 bg-brand-primary-blue -translate-x-full group-hover:translate-x-0 ease">
                 Contact Us
               </span>
-              {/* This span is visible by default and slides out */}
               <span className="absolute flex items-center justify-center w-full h-full text-brand-dark-blue transition-all duration-300 transform group-hover:translate-x-full ease">
                 Contact Us
               </span>
-              {/* This span is used for sizing the button correctly */}
               <span className="relative invisible">Contact Us</span>
             </button>
           )}
