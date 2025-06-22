@@ -70,7 +70,7 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
         )}
         <div>
           <div className="p-4 flex flex-col md:flex-row items-center justify-between">
-            <h2 className="text-2xl font-semibold mb-2">{chapter.title}</h2>
+            <h2 className="text-2xl font-semibold mb-2 text-brand-deep-blue"> Chapter: {chapter.title}</h2>
             {purchase ? (
               <CourseProgressButton
                 chapterId={params.chapterId}
@@ -82,9 +82,10 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
               <CourseEnrollButton />
             )}
           </div>
-          <Separator />
+          <Separator className=" bg-slate-400" />
           <div>
-            <Preview value={chapter.description!} />
+            <p className="text-lg pl-4 pt-4 font-medium text-brand-dark-blue">Chapter Description:</p>
+            <Preview value={chapter.description!} /> {/* add N/A here if description is null */}
           </div>
           {!!attachments.length && (
             <>
