@@ -9,6 +9,7 @@ import { ArrowRight, Award, ClipboardCheck, HeartHandshake, PlayCircle, Users } 
 import { db } from '@/lib/db'
 import { CourseCard } from '@/components/course-card'
 import { WhyNexusSection } from '../_components/why-nexus-section'
+import { OurTeamSection } from '../_components/our-team-section'
 import { auth } from '@clerk/nextjs/server'
 import { getProgress } from '@/actions/get-progress'
 
@@ -170,6 +171,7 @@ export default async function Home() {
 
       {/* Why Nexus Section */}
       <WhyNexusSection />
+      <OurTeamSection />
     </div>
   )
 }

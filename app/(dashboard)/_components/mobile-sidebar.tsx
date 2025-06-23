@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 const mobileRoutes = [
   { href: '/', label: 'Home', icon: Layout },
   { href: '/search', label: 'Our Courses', icon: Compass },
-  { href: '/#team', label: 'Our Team', icon: Users },
+  { href: '/#our-team', label: 'Our Team', icon: Users },
   { href: '/#why-nexus', label: 'Why Nexus', icon: Award },
   { href: '/contact', label: 'Contact Us', icon: User },
 ]

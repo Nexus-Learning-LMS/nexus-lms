@@ -21,7 +21,7 @@ const guestRoutes = [
   {
     icon: Compass,
     label: 'Our Team',
-    href: '/#team',
+    href: '/#our-team',
   },
   {
     icon: Compass,
