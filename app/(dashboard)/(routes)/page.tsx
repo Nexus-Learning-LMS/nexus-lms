@@ -8,6 +8,7 @@ import { ArrowRight, Award, ClipboardCheck, HeartHandshake, PlayCircle, Users } 
 
 import { db } from '@/lib/db'
 import { CourseCard } from '@/components/course-card'
+import { WhyNexusSection } from '../_components/why-nexus-section'
 import { auth } from '@clerk/nextjs/server'
 import { getProgress } from '@/actions/get-progress'
 
@@ -168,34 +169,7 @@ export default async function Home() {
       </section>
 
       {/* Why Nexus Section */}
-      <section id="why-nexus" className="py-16 md:py-20 bg-white">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-brand-dark-blue">Why Nexus Learning?</h2>
-            <p className="text-slate-500 mt-2 max-w-2xl mx-auto">
-              We've built a learning environment that prioritizes personal growth, expert guidance, and real-world
-              skills.
-            </p>
-          </div>
-          {/* The conditional centering logic has been removed to allow for natural grid flow */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="p-6 rounded-lg border border-slate-300 shadow-lg shadow-slate-600/30 hover:border-brand-primary-blue/50 hover:shadow-xl hover:shadow-brand-gradient-blue-light transform hover:-translate-y-2 transition-all duration-300"
-              >
-                <div className="flex items-center gap-x-4">
-                  <div className="bg-brand-primary-blue/10 p-3 rounded-full">
-                    <feature.icon className="h-6 w-6 text-brand-primary-blue" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-brand-deep-blue">{feature.title}</h3>
-                </div>
-                <p className="text-slate-600 mt-4">{feature.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <WhyNexusSection />
     </div>
   )
 }
