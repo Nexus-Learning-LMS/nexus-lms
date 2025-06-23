@@ -100,8 +100,10 @@ export default async function Home() {
         {/* Left Side: Content */}
         <div className="flex flex-1 items-center justify-center bg-brand-primary-blue text-white p-8 md:p-12 lg:p-16">
           <div className="max-w-lg space-y-6">
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight">More than Tuition - its a Transformation.</h1>
-            <p className="text-lg text-slate-300">
+            <h1 className="text-4xl md:text-5xl font-bold leading-tight cursor-default">
+              More than Tuition - its a Transformation.
+            </h1>
+            <p className="text-lg text-slate-300 cursor-default">
               Improvement isn't a promise here, it's a pattern. We track growth, celebrate wins, and keep moving
               forward.
             </p>
@@ -139,7 +141,7 @@ export default async function Home() {
       {/* Our Courses Section */}
       <section className="py-16 md:py-20 bg-brand-light-gray/50">
         <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
+          <div className="text-center mb-12 cursor-default">
             <h2 className="text-3xl md:text-4xl font-bold text-brand-dark-blue">Our Featured Courses</h2>
             <p className="text-slate-500 mt-2">Get started with our most popular learning paths.</p>
           </div>

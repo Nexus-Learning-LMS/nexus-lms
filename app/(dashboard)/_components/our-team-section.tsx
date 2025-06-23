@@ -49,7 +49,7 @@ export const OurTeamSection = () => {
   return (
     <section id="our-team" className="py-16 md:py-20 bg-brand-light-gray/50">
       <div className="container mx-auto px-6">
-        <div className="text-center mb-12 md:mb-16">
+        <div className="text-center mb-12 md:mb-16 cursor-default">
           <h2 className="text-3xl md:text-4xl font-bold text-brand-dark-blue">Our Team</h2>
           <p className="text-slate-500 mt-2 max-w-2xl mx-auto">
             Meet the passionate educators and mentors dedicated to your success.
@@ -59,7 +59,7 @@ export const OurTeamSection = () => {
         {/* --- START OF CHANGE: Grid Layout Update --- */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
           {/* Left Side: "Letter" content - now spans 7 columns */}
-          <div className="order-2 md:order-1 md:col-span-8 bg-white p-8 rounded-lg shadow-lg relative">
+          <div className="order-2 md:order-1 md:col-span-8 bg-white p-8 rounded-lg shadow-lg relative cursor-default">
             <h3 className="text-2xl font-bold text-brand-deep-blue mb-3">One Vision, One Purpose</h3>
             <p className="text-slate-600 mb-4">
               We are united by a shared goal: To build a learning space where no student is left behind.
