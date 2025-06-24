@@ -132,7 +132,7 @@ export const OurTeamSection = () => {
             </div>
 
             {/* Dot Indicators */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2">
+            <div className="absolute md:bottom-5 bottom-8 left-1/2 -translate-x-1/2 flex space-x-2">
               {teamMembers.map((_, index) => (
                 <button
                   key={index}
