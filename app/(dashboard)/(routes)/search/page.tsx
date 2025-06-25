@@ -46,7 +46,7 @@ const SearchPage = async ({ searchParams }: SearchPageProps) => {
         </div>
       </div>
 
-      <div className="p-6 space-y-8">
+      <div className="p-6 space-y-8 md:pb-16">
         {/* Categories section with inline title */}
         <div className="flex items-center gap-x-4">
           <h2 className="text-lg font-semibold text-brand-deep-blue whitespace-nowrap pb-2">Filter by:</h2>

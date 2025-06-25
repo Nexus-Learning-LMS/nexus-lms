@@ -67,6 +67,11 @@ export const Footer = () => {
                   Why Nexus
                 </Link>
               </li>
+              <li>
+                <Link href="/privacy-policy" className="text-slate-400 hover:text-white transition">
+                  Privacy Policy
+                </Link>
+              </li>
             </ul>
           </div>
 
