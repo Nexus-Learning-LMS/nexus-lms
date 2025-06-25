@@ -47,7 +47,7 @@ export const OurTeamSection = () => {
   }
 
   return (
-    <section id="our-team" className="py-16 md:py-20 bg-brand-light-gray/50">
+    <section id="our-team" className="py-16 md:py-20  md:pb-40 bg-brand-light-gray/50">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12 md:mb-16 cursor-default">
           <h2 className="text-3xl md:text-4xl font-bold text-brand-dark-blue">Our Team</h2>
