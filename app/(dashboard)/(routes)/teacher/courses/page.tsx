@@ -1,17 +1,3 @@
-// import { Button } from '@/components/ui/button'
-// import Link from 'next/link'
-
-// const CoursesPage = () => {
-//   return (
-//     <div className="p-6">
-//       <Link href="/teacher/create">
-//         <Button>New Course</Button>
-//       </Link>
-//     </div>
-//   )
-// }
-
-// export default CoursesPage
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 
@@ -27,14 +13,28 @@ const CoursesPage = async () => {
     return redirect('/')
   }
 
+  // --- START OF CHANGE: Updated Prisma Query ---
+  // This query now fetches courses based on the new logic.
+  // It uses an 'OR' operator to combine two conditions:
+  // 1. Fetch all courses that are published.
+  // 2. Fetch all courses that are drafts AND created by the current user.
   const courses = await db.course.findMany({
     where: {
-      userId,
+      OR: [
+        {
+          isPublished: true,
+        },
+        {
+          userId: userId,
+          isPublished: false,
+        },
+      ],
     },
     orderBy: {
       createdAt: 'desc',
     },
   })
+  // --- END OF CHANGE ---
 
   return (
     <div className="p-6">
@@ -42,5 +42,4 @@ const CoursesPage = async () => {
     </div>
   )
 }
-
 export default CoursesPage

@@ -70,7 +70,9 @@ const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
 
   return (
     <>
-      {!course.isPublished && <Banner label="This course is unpublished. It will not be visible to the students." />}
+      {!course.isPublished && (
+        <Banner label="This course is unpublished. It will not be visible to the students." variant="warning2" />
+      )}
       <div className="p-6">
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-y-2">
