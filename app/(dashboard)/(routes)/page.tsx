@@ -139,7 +139,7 @@ export default async function Home() {
       </section>
 
       {/* Our Courses Section */}
-      <section className="py-16 md:py-20 bg-brand-light-gray/50">
+      <section className="py-16 md:py-20 md:px-8 bg-brand-light-gray/50">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12 cursor-default">
             <h2 className="text-3xl md:text-4xl font-bold text-brand-dark-blue">Our Featured Courses</h2>

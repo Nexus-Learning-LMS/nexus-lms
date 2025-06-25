@@ -8,7 +8,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
       <div className=" md:h-20 md:inset-y-0 md:w-full md:z-30">
         <Navbar />
       </div>
-      <main className="flex-grow ">{children}</main>
+      <main className="flex-grow">{children}</main>
       <Footer />
     </div>
   )

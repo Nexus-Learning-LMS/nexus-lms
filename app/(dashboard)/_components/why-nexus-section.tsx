@@ -101,7 +101,7 @@ export const WhyNexusSection = () => {
   }, [isPaused, currentImageIndex]) // The empty dependency array ensures this effect runs only once on mount.
 
   return (
-    <section id="why-nexus" className="py-16 md:py-20 bg-white">
+    <section id="why-nexus" className="py-16 md:py-20 md:px-8 bg-white">
       <div className="container mx-auto px-6">
         <div className="text-center mb-12 md:mb-16 cursor-default">
           <h2 className="text-3xl md:text-4xl font-bold text-brand-dark-blue">Why Nexus Learning?</h2>
