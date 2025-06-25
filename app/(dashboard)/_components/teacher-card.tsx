@@ -15,6 +15,7 @@ export const TeacherCard = ({ name, title, quote, imageUrl }: TeacherCardProps) 
         alt={`Photo of ${name}`}
         fill
         className="object-cover transition-transform duration-500 group-hover:scale-110"
+        sizes="(max-width: 768px) 100vw, 384px"
       />
       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
       <div className="absolute bottom-0 left-0 right-0 p-6 pb-14 text-white">

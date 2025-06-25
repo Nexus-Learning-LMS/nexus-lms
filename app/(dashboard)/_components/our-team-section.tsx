@@ -56,7 +56,6 @@ export const OurTeamSection = () => {
           </p>
         </div>
 
-        {/* --- START OF CHANGE: Grid Layout Update --- */}
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
           {/* Left Side: "Letter" content - now spans 7 columns */}
           <div className="order-2 md:order-1 md:col-span-8 bg-white p-8 rounded-lg shadow-lg relative cursor-default mx-auto">

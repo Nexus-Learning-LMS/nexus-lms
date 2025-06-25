@@ -18,7 +18,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { MultiSelect, Framework } from '@/components/ui/multi-select'
 import { cn } from '@/lib/utils'
 
-// --- Form Schema with Zod ---
 const formSchema = z.object({
   name: z.string().min(2, { message: 'Name is required.' }),
   email: z.string().email({ message: 'Please enter a valid email address.' }),
@@ -27,7 +26,6 @@ const formSchema = z.object({
   remarks: z.string().optional(),
 })
 
-// --- Main Page Component ---
 const ContactPage = () => {
   const [courses, setCourses] = useState<Framework[]>([])
   const [isFetchingCourses, setIsFetchingCourses] = useState(true)
@@ -52,7 +50,6 @@ const ContactPage = () => {
     fetchCourses()
   }, [])
 
-  // --- Form Hook Initialization ---
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -64,7 +61,6 @@ const ContactPage = () => {
     },
   })
 
-  // --- Submit Handler ---
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
@@ -106,7 +102,6 @@ const ContactPage = () => {
     }
   }
 
-  // --- JSX Rendering ---
   return (
     <>
       {/* Blue Header Section */}

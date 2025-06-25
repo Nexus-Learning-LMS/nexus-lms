@@ -144,7 +144,7 @@ export const WhyNexusSection = () => {
                     index === currentImageIndex ? 'opacity-100' : 'opacity-0',
                   )}
                 >
-                  <Image src={image.src} alt={image.alt} fill className="object-cover rounded-lg" />
+                  <Image src={image.src} alt={image.alt} fill className="object-cover rounded-lg" sizes="100vw" />
                 </div>
               ))}
               <div className="absolute inset-0 flex justify-between items-center p-2">
@@ -161,7 +161,7 @@ export const WhyNexusSection = () => {
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
-                    setIsPaused(true) // Pause on arrow click
+                    setIsPaused(true)
                     handleNext()
                   }}
                   className="bg-white/50 hover:bg-white/80 p-2 rounded-full backdrop-blur-sm transition"

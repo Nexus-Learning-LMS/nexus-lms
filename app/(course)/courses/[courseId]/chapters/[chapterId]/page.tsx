@@ -85,7 +85,7 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
           <Separator className=" bg-slate-400" />
           <div>
             <p className="text-lg pl-4 pt-4 font-medium text-brand-dark-blue">Chapter Description:</p>
-            <Preview value={chapter.description!} /> {/* add N/A here if description is null */}
+            <Preview value={chapter.description!} />
           </div>
           {!!attachments.length && (
             <>
