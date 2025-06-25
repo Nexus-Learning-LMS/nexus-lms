@@ -115,7 +115,7 @@ export const WhyNexusSection = () => {
           {/* --- Left Side: Image Collage (Desktop) & Carousel (Mobile) --- */}
           <div className="w-full">
             {/* Desktop Image Collage */}
-            <div className="hidden md:grid grid-cols-[repeat(21,1fr)] grid-rows-[repeat(16,1fr)] gap-4 h-auto">
+            <div className="hidden md:grid grid-cols-[repeat(21,1fr)] grid-rows-[repeat(16,1fr)] gap-4 h-[530px]">
               {collageImages.map((image, index) => (
                 <div key={image.src} className={cn('rounded-lg overflow-hidden shadow-lg', imageGridClasses[index])}>
                   <Image
@@ -123,7 +123,7 @@ export const WhyNexusSection = () => {
                     alt={image.alt}
                     width={500}
                     height={500}
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110 aspect-square"
                   />
                 </div>
               ))}

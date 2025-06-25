@@ -34,6 +34,11 @@ const CourseLayout = async ({ children, params }: { children: React.ReactNode; p
           position: 'asc',
         },
       },
+      purchases: {
+        where: {
+          userId,
+        },
+      },
     },
   })
 
@@ -42,7 +47,35 @@ const CourseLayout = async ({ children, params }: { children: React.ReactNode; p
   }
 
   const progressCount = await getProgress(userId, course.id)
+  const hasPurchased = course.purchases.length > 0
 
+  // Apply the rolling window logic
+  if (hasPurchased) {
+    const paidChapters = course.chapters.filter((chapter) => !chapter.isFree)
+    const completedPaidChapters = paidChapters.filter((chapter) => chapter.userProgress?.[0]?.isCompleted)
+
+    // Find the position of the last completed non-free chapter.
+    // If none are complete, this will be -1, so the window starts at chapter 0.
+    const lastCompletedPosition =
+      completedPaidChapters.length > 0 ? Math.max(...completedPaidChapters.map((c) => c.position)) : -1
+
+    // The window of unlocked chapters starts after the last completed one.
+    const unlockWindowStart = paidChapters.findIndex((c) => c.position > lastCompletedPosition)
+
+    course.chapters.forEach((chapter) => {
+      if (!chapter.isFree) {
+        const chapterIndexInPaidList = paidChapters.findIndex((c) => c.id === chapter.id)
+        // A chapter is locked if it's outside the 3-chapter window
+        const isLocked = chapterIndexInPaidList < unlockWindowStart || chapterIndexInPaidList >= unlockWindowStart + 3
+        // We attach our calculated lock status to the chapter object.
+        // The 'any' type is used here to dynamically add a property.
+        ;(chapter as any).isLocked = isLocked
+      } else {
+        ;(chapter as any).isLocked = false // Free chapters are never locked
+      }
+    })
+  }
+  
   return (
     <div className="h-full">
       <div className="h-[80px] md:pl-80 fixed inset-y-0 w-full z-50">

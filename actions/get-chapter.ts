@@ -21,32 +21,6 @@ export const getChapter = async ({
   purchase: Purchase | null
 }> => {
   try {
-    const course = await db.course.findUnique({
-      where: {
-        isPublished: true,
-        id: courseId,
-      },
-      include: {
-        chapters: {
-          where: {
-            id: chapterId,
-            isPublished: true,
-          },
-          include: {
-            muxData: true,
-          },
-        },
-      },
-    })
-
-    if (!course || !course.chapters.length) {
-      throw new Error('Course or chapter not found')
-    }
-
-    const chapter = course.chapters[0]
-    const muxData = chapter.muxData
-
-    // Check for purchase after finding the course
     const purchase = await db.purchase.findUnique({
       where: {
         userId_courseId: {
@@ -56,47 +30,85 @@ export const getChapter = async ({
       },
     })
 
-    const isLocked = !chapter.isFree && !purchase
-    if (isLocked) {
-      // If the chapter is locked, we don't need to fetch attachments or the next chapter.
-      return {
-        chapter,
-        course,
-        muxData,
-        attachments: [],
-        nextChapter: null,
-        userProgress: null,
-        purchase,
+    const course = await db.course.findUnique({
+      where: {
+        isPublished: true,
+        id: courseId,
+      },
+      include: {
+        // Use include to get all course fields
+        chapters: {
+          // We still need all chapters to calculate the window
+          where: { isPublished: true },
+          orderBy: { position: 'asc' },
+        },
+      },
+    })
+
+    const chapter = await db.chapter.findUnique({
+      where: {
+        id: chapterId,
+        isPublished: true,
+      },
+    })
+
+    if (!chapter || !course) {
+      throw new Error('Chapter or course not found')
+    }
+
+    let muxData = null
+    let attachments: Attachment[] = []
+    let nextChapter: Chapter | null = null
+    let userProgress = null
+
+    const hasPurchased = !!purchase
+    let isLocked = !chapter.isFree && !hasPurchased
+
+    if (hasPurchased) {
+      const allUserProgress = await db.userProgress.findMany({
+        where: { userId, chapterId: { in: course.chapters.map((c) => c.id) } },
+      })
+
+      const paidChapters = course.chapters.filter((c) => !c.isFree)
+      const completedPaidChapters = paidChapters.filter((c) =>
+        allUserProgress.some((p) => p.chapterId === c.id && p.isCompleted),
+      )
+
+      const lastCompletedPosition =
+        completedPaidChapters.length > 0 ? Math.max(...completedPaidChapters.map((c) => c.position)) : -1
+
+      const unlockWindowStart = paidChapters.findIndex((c) => c.position > lastCompletedPosition)
+      const chapterIndexInPaidList = paidChapters.findIndex((c) => c.id === chapter.id)
+
+      // Update the lock status based on the windowing logic
+      if (!chapter.isFree) {
+        isLocked = chapterIndexInPaidList < unlockWindowStart || chapterIndexInPaidList >= unlockWindowStart + 3
       }
     }
 
-    // If accessible, fetch remaining data
-    const attachments = await db.attachment.findMany({
-      where: {
-        courseId: courseId,
-      },
-    })
+    // Only fetch the video data if the chapter is not locked
+    if (!isLocked) {
+      muxData = await db.muxData.findUnique({
+        where: { chapterId: chapterId },
+      })
 
-    const nextChapter = await db.chapter.findFirst({
+      attachments = await db.attachment.findMany({
+        where: { courseId: courseId },
+      })
+    }
+
+    // Find the next chapter regardless of lock status for UI purposes
+    nextChapter = await db.chapter.findFirst({
       where: {
         courseId: courseId,
         isPublished: true,
-        position: {
-          gt: chapter.position,
-        },
+        position: { gt: chapter.position },
       },
-      orderBy: {
-        position: 'asc',
-      },
+      orderBy: { position: 'asc' },
     })
 
-    const userProgress = await db.userProgress.findUnique({
-      where: {
-        userId_chapterId: {
-          userId,
-          chapterId,
-        },
-      },
+    userProgress = await db.userProgress.findUnique({
+      where: { userId_chapterId: { userId, chapterId } },
     })
 
     return {
@@ -108,7 +120,6 @@ export const getChapter = async ({
       userProgress,
       purchase,
     }
-    // --- End of Refactored Logic ---
   } catch (error) {
     console.log('[GET_CHAPTER]', error)
     return {

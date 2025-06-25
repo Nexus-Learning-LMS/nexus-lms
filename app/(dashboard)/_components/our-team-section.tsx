@@ -8,16 +8,16 @@ import { Separator } from '@/components/ui/separator'
 
 const teamMembers = [
   {
-    name: 'Adarsh',
-    title: 'Founding Mentor',
-    quote: 'Every time a student says "oh yes I got it now" that feels like a reward.',
-    imageUrl: '/nexus-team/img-adarsh.JPEG',
-  },
-  {
     name: 'Anmol',
     title: 'Founding Mentor',
     quote: 'We meet students where they are and take them where they want to be.',
     imageUrl: '/nexus-team/img-anmol.JPEG',
+  },
+  {
+    name: 'Adarsh',
+    title: 'Founding Mentor',
+    quote: 'Every time a student says "oh yes I got it now" that feels like a reward.',
+    imageUrl: '/nexus-team/img-adarsh.JPEG',
   },
   {
     name: 'Mahesh',

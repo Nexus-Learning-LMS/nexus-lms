@@ -4,21 +4,22 @@ import { redirect } from 'next/navigation'
 
 import { db } from '@/lib/db'
 import { CourseProgress } from '@/components/course-progress'
-
 import { CourseSidebarItem } from './course-sidebar-item'
+
+type ChapterWithLockStatus = Chapter & {
+  userProgress: UserProgress[] | null
+  isLocked?: boolean // This property is now expected
+}
 
 interface CourseSidebarProps {
   course: Course & {
-    chapters: (Chapter & {
-      userProgress: UserProgress[] | null
-    })[]
+    chapters: ChapterWithLockStatus[]
   }
   progressCount: number
 }
 
 export const CourseSidebar = async ({ course, progressCount }: CourseSidebarProps) => {
   const { userId } = await auth()
-
   if (!userId) {
     return redirect('/')
   }
@@ -50,7 +51,8 @@ export const CourseSidebar = async ({ course, progressCount }: CourseSidebarProp
             label={chapter.title}
             isCompleted={!!chapter.userProgress?.[0]?.isCompleted}
             courseId={course.id}
-            isLocked={!chapter.isFree && !purchase}
+            // Use the calculated lock status. Fallback to original logic if not purchased.
+            isLocked={chapter.isLocked !== undefined ? chapter.isLocked : !chapter.isFree && !purchase}
           />
         ))}
       </div>
