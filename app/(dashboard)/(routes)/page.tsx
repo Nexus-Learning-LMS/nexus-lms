@@ -96,9 +96,9 @@ export default async function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="min-h-[calc(100vh)] flex flex-col md:flex-row">
+      <section className="min-h-screen grid grid-cols-1 md:grid-cols-4">
         {/* Left Side: Content */}
-        <div className="flex flex-1 items-center justify-center bg-brand-primary-blue text-white p-8 md:p-12 lg:p-16">
+        <div className="flex md:col-span-2 items-center justify-center bg-brand-primary-blue text-white p-8 md:p-12 lg:p-16">
           <div className="max-w-lg space-y-6">
             <h1 className="text-4xl md:text-5xl font-bold leading-tight cursor-default">
               More than Tuition - its a Transformation.
@@ -127,7 +127,7 @@ export default async function Home() {
         </div>
 
         {/* Right Side: Image */}
-        <div className="relative flex-1 hidden md:block">
+        <div className="relative md:col-span-2 hidden md:block">
           <Image
             src="/illustration.svg"
             alt="Hero Image showing students learning"

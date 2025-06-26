@@ -17,7 +17,7 @@ export const Logo = () => {
         <Image height={50} width={50} src="/nexus-logo.PNG" alt="Logo" />
         <h3
           className={cn(
-            'ml-3 text-2xl font-bold  whitespace-nowrap', // Tailwind classes for spacing, size, etc.
+            'ml-3 text-2xl font-bold  whitespace-nowrap text-white', // Tailwind classes for spacing, size, etc.
             font.className, // Apply the custom Poppins font
           )}
         >
