@@ -42,7 +42,7 @@ export const Navbar = () => {
           <div className="md:hidden">
             <MobileSidebar />
           </div>
-      </div>
+        </div>
       </div>
     </div>
   )

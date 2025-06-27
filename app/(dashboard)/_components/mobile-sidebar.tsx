@@ -52,7 +52,7 @@ export const MobileSidebar = () => {
       </SheetTrigger>
 
       {isScrolled && (
-        <SheetTrigger className="md:hidden fixed top-4 left-4 z-50 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg transition-opacity duration-300">
+        <SheetTrigger className="md:hidden fixed top-4 right-4 z-50 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-lg transition-opacity duration-300">
           <Menu className="text-brand-deep-blue" />
         </SheetTrigger>
       )}
