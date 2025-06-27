@@ -24,27 +24,25 @@ export const Navbar = () => {
       {/* This div holds the navbar content, positioned on top of the background. */}
       <div className="relative z-10 p-4 h-full flex items-center justify-between">
         {/* --- Left Section (1/3) --- */}
-        {/* Contains the logo on desktop and the mobile trigger */}
-        <div className="flex-1 flex justify-start md:pr-6">
-          <div className="md:hidden">
-            <MobileSidebar />
-          </div>
-          <div className="hidden md:block">
-            <Logo />
-          </div>
+        {/* Left Section: Always contains the logo */}
+        <div className="flex-1 flex justify-start">
+          <Logo />
         </div>
 
-        {/* --- Middle Section (1/3) --- */}
-        {/* Contains the main navigation links, hidden on mobile */}
+        {/* Middle Section: Contains the main navigation links, hidden on mobile */}
         <div className="hidden md:flex flex-1 justify-center">
           <NavbarRoutes />
         </div>
 
-        {/* --- Right Section (1/3) --- */}
-        {/* Contains the auth buttons, also handled within NavbarRoutes for logic */}
-        <div className="hidden md:flex flex-1 justify-end">
-          <NavbarRoutes isAuthSection={true} />
-        </div>
+        {/* Right Section: Contains auth buttons on desktop and the hamburger menu on mobile */}
+        <div className="flex-1 flex justify-end">
+          <div className="hidden md:flex">
+            <NavbarRoutes isAuthSection={true} />
+          </div>
+          <div className="md:hidden">
+            <MobileSidebar />
+          </div>
+      </div>
       </div>
     </div>
   )
