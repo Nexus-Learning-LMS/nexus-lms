@@ -3,70 +3,70 @@
 import { UserButton, useAuth } from '@clerk/nextjs'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
-import { LogOut, Compass, Layout, User, List, BarChart, BookUser } from 'lucide-react'
+import { LogOut, Compass, Layout, User, List, BarChart, BookUser, HelpCircle, Users2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
+import { isTeacher as checkIsTeacher } from '@/lib/teacher' // Import the new helper function
 
-const guestRoutes = [
-  {
-    icon: Layout,
-    label: 'Home',
-    href: '/',
-  },
-  {
-    icon: Compass,
-    label: 'Our Courses',
-    href: '/search',
-  },
-  {
-    icon: Compass,
-    label: 'Our Team',
-    href: '/#our-team',
-  },
-  {
-    icon: Compass,
-    label: 'Why Nexus?',
-    href: '/#why-nexus',
-  },
-  {
-    icon: User,
-    label: 'Contact Us',
-    href: '/contact',
-  },
+const leftGuestRoutes = [
+  { label: 'Home', href: '/' },
+  { label: 'Our Courses', href: '/search' },
+]
+
+const rightGuestRoutes = [
+  { label: 'Our Team', href: '/#our-team' },
+  { label: 'Why Nexus?', href: '/#why-nexus' },
 ]
 
 const teacherRoutes = [
-  { icon: List, label: 'Courses', href: '/teacher/courses' },
-  { icon: BarChart, label: 'Analytics', href: '/teacher/analytics' },
-  { icon: BookUser, label: 'User Enrollments', href: '/teacher/enrollments' },
+  { label: 'Courses', href: '/teacher/courses' },
+  { label: 'Analytics', href: '/teacher/analytics' },
+  { label: 'User Enrollments', href: '/teacher/enrollments' },
 ]
 
-export const NavbarRoutes = () => {
-  const { userId, sessionClaims } = useAuth()
+export const NavbarRoutes = ({ isAuthSection = false }: { isAuthSection?: boolean }) => {
+  const { userId } = useAuth()
   const pathname = usePathname()
+  const [activeHash, setActiveHash] = useState('')
 
-  // // Check if the user is a teacher based on Clerk session metadata
-  // const isTeacher = sessionClaims?.metadata?.role === 'admin'
+  useEffect(() => {
+    const handleHashChange = () => setActiveHash(window.location.hash)
+    handleHashChange()
+    window.addEventListener('hashchange', handleHashChange, { passive: true })
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
 
+  const isHomepage = pathname === '/'
+  const isTeacher = checkIsTeacher(userId) // Use the new helper function
   const isTeacherPage = pathname?.startsWith('/teacher')
   const isCoursePage = pathname?.includes('/courses')
 
-  const routes = isTeacherPage ? teacherRoutes : guestRoutes
+  const NavLink = ({ href, label, isDarkText = false }: { href: string; label: string; isDarkText?: boolean }) => {
+    const isAnchorLink = href.startsWith('/#')
+    let isActive = false
+    if (isAnchorLink) {
+      isActive = pathname === '/' && activeHash === href.slice(1)
+    } else {
+      isActive = pathname === href
+    }
+    if (href === '/' && activeHash) {
+      isActive = false
+    }
 
-  // Helper component for a single navigation link with updated styles
-  const NavLink = ({ href, label }: { href: string; label: string }) => {
-    const isActive = pathname === href
+    const linkColor = isHomepage && isDarkText ? 'text-brand-deep-blue' : 'text-white'
+    const hoverColor = isHomepage && isDarkText ? 'hover:bg-slate-100' : 'hover:bg-white/10'
+    const activeBg = isHomepage && isDarkText ? 'bg-slate-200' : 'bg-white/20'
+
     return (
       <Link href={href}>
         <div
-          className={`
-            px-4 py-2 rounded-md text-sm font-medium transition-all
-            ${
-              isActive
-                ? ' text-blue-600' // Selected state
-                : 'text-slate-300 hover:bg-brand-light-gray hover:text-brand-deep-blue' // Default and Hover states
-            }
-          `}
+          className={cn(
+            'px-4 py-2 rounded-md text-sm font-medium transition-all',
+            isActive ? activeBg : hoverColor,
+            linkColor,
+          )}
         >
           {label}
         </div>
@@ -74,40 +74,55 @@ export const NavbarRoutes = () => {
     )
   }
 
-  return (
-    // This container manages the three sections of the navbar for proper centering
-    <div className="flex items-center justify-between w-full">
-      {/* Left spacer (to help center the middle links) */}
-      <div className=""></div> {/* Invisible spacer to balance the logo width */}
-      {/* Middle Navigation Links (Desktop Only) */}
-      <div className="hidden md:flex gap-x-6 mx-auto">
-        {routes.map((route) => (
-          <NavLink key={route.href} href={route.href} label={route.label} />
-        ))}
-      </div>
-      {/* Right-side Auth and Action Buttons */}
-      <div className="flex gap-x-2 items-center">
-        {userId && (isTeacherPage || isCoursePage) ? (
+  if (isAuthSection) {
+    return (
+      <div className="flex items-center gap-x-2">
+        {isTeacherPage || isCoursePage ? (
           <Link href="/">
-            <Button size="sm" variant="secondary" className="text-white hover:bg-white/10">
-              <LogOut className="h-4 w-4 mr-2" />
-              Exit
+            <Button size="sm" variant="ghost" className="text-white hover:bg-white/10">
+              <LogOut className="h-4 w-4 mr-2" /> Exit
             </Button>
           </Link>
-        ) : userId ? (
-          <Link href="/teacher/courses">
-            <Button className="w-full sm:w-auto text-white border-white hover:bg-white/10text-white hover:bg-white/10">
-              Teacher mode
-            </Button>
-          </Link>
-        ) : null}
-
+        ) : (
+          <>
+            {isTeacher && (
+              <Link href="/teacher/courses">
+                <Button
+                  size="sm"
+                  className={
+                    isHomepage
+                      ? 'text-brand-deep-blue hover:bg-slate-100 border border-brand-deep-blue'
+                      : 'text-white hover:bg-white/10'
+                  }
+                >
+                  Teacher mode
+                </Button>
+              </Link>
+            )}
+            <Link href="/contact">
+              <Button
+                size="sm"
+                className={
+                  isHomepage
+                    ? 'text-white hover:bg-brand-deep-blue bg-brand-primary-blue'
+                    : 'text-white hover:bg-white/10'
+                }
+              >
+                Contact Us
+              </Button>
+            </Link>
+          </>
+        )}
         {userId ? (
           <UserButton afterSignOutUrl="/" />
         ) : (
           <div className="flex gap-x-2">
             <Link href="/sign-in">
-              <Button size="sm" variant="ghost" className="text-white hover:bg-white/10">
+              <Button
+                size="sm"
+                variant="ghost"
+                className={isHomepage ? 'text-brand-deep-blue hover:bg-slate-100' : 'text-white hover:bg-white/10'}
+              >
                 Sign In
               </Button>
             </Link>
@@ -119,6 +134,23 @@ export const NavbarRoutes = () => {
           </div>
         )}
       </div>
+    )
+  }
+
+  return (
+    <div className="flex gap-x-6">
+      {isTeacherPage ? (
+        teacherRoutes.map((route) => <NavLink key={route.href} href={route.href} label={route.label} />)
+      ) : (
+        <>
+          {leftGuestRoutes.map((route) => (
+            <NavLink key={route.href} href={route.href} label={route.label} />
+          ))}
+          {rightGuestRoutes.map((route) => (
+            <NavLink key={route.href} href={route.href} label={route.label} isDarkText={true} />
+          ))}
+        </>
+      )}
     </div>
   )
 }

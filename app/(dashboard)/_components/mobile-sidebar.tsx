@@ -48,7 +48,7 @@ export const MobileSidebar = () => {
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger className="md:hidden pr-4 hover:opacity-75 transition">
-        <Menu />
+        <Menu className="text-white" />
       </SheetTrigger>
 
       {isScrolled && (
