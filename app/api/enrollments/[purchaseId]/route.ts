@@ -10,7 +10,6 @@ export async function DELETE(req: Request, { params }: { params: { purchaseId: s
     //   return new NextResponse('Unauthorized', { status: 401 })
     // }
 
-    // --- START OF CHANGE ---
     // Find the purchase record to get userId and courseId before deleting
     const purchase = await db.purchase.findUnique({
       where: {
@@ -51,7 +50,6 @@ export async function DELETE(req: Request, { params }: { params: { purchaseId: s
     })
 
     return NextResponse.json(deletedPurchase)
-    // --- END OF CHANGE ---
   } catch (error) {
     console.log('[ENROLLMENTS_DELETE]', error)
     return new NextResponse('Internal Error', { status: 500 })

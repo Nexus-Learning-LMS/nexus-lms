@@ -11,12 +11,18 @@ import { TitleForm } from './_components/title-form'
 import { DescriptionForm } from './_components/description-form'
 import { ImageForm } from './_components/image-form'
 import { CategoryForm } from './_components/category-form'
-// import { PriceForm } from './_components/price-form'
 import { AttachmentForm } from './_components/attachment-form'
 import { ChaptersForm } from './_components/chapters-form'
 import { Actions } from './_components/actions'
 
-const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
+interface CourseIdPageProps {
+  params: Promise<{
+    courseId: string
+  }>
+}
+
+const CourseIdPage = async ({ params: paramsPromise }: CourseIdPageProps) => {
+  const params = await paramsPromise
   const { userId } = await auth()
 
   if (!userId) {

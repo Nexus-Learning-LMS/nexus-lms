@@ -9,13 +9,14 @@ import { CoursesList } from '@/components/courses-list'
 import { Categories } from './_components/categories'
 
 interface SearchPageProps {
-  searchParams: {
+  searchParams: Promise<{
     title: string
     categoryId: string
-  }
+  }>
 }
 
-const SearchPage = async ({ searchParams }: SearchPageProps) => {
+const SearchPage = async ({ searchParams: searchParamsPromise }: SearchPageProps) => {
+  const searchParams = await searchParamsPromise
   const { userId } = await auth()
 
   if (!userId) {

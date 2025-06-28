@@ -13,7 +13,7 @@ const CoursesPage = async () => {
     return redirect('/')
   }
 
-  // --- START OF CHANGE: Updated Prisma Query ---
+  // ---  Prisma Query ---
   // This query now fetches courses based on the new logic.
   // It uses an 'OR' operator to combine two conditions:
   // 1. Fetch all courses that are published.

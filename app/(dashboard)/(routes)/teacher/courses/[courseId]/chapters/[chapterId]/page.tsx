@@ -13,7 +13,15 @@ import { ChapterAccessForm } from './_components/chapter-access-form'
 import { ChapterVideoForm } from './_components/chapter-video-form'
 import { ChapterActions } from './_components/chapter-actions'
 
-const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId: string } }) => {
+interface ChapterIdPageProps {
+  params: Promise<{
+    courseId: string
+    chapterId: string
+  }>
+}
+
+const ChapterIdPage = async ({ params: paramsPromise }: ChapterIdPageProps) => {
+  const params = await paramsPromise
   const { userId } = await auth()
 
   if (!userId) {
@@ -43,7 +51,6 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
 
   const isComplete = requiredFields.every(Boolean)
 
-
   // // 1. Define the fields required for the UI completion text.
   // //    These are the fields the user can directly edit.
   // const uiRequiredFields = [chapter.title, chapter.description, chapter.videoUrl]
@@ -62,7 +69,6 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
 
   // // 4. Calculate the TRUE completeness for the button's disabled state.
   // const isComplete = functionalRequiredFields.every(Boolean)
-
 
   return (
     <>

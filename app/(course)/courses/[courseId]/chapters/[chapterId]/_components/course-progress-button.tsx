@@ -39,9 +39,7 @@ export const CourseProgressButton = ({
   const [isLoading, setIsLoading] = useState(false)
 
   const [dontShowAgain, setDontShowAgain] = useState(false)
-  // --- START OF CHANGE: Added state to manually control the modal ---
   const [isModalOpen, setIsModalOpen] = useState(false)
-  // --- END OF CHANGE ---
 
   const handleMarkComplete = async () => {
     try {
@@ -68,7 +66,6 @@ export const CourseProgressButton = ({
     }
   }
 
-  // --- START OF CHANGE: Updated onClick logic ---
   const onClick = () => {
     const hasSkippedWarning = localStorage.getItem('skipChapterCompletionWarning') === 'true'
 
@@ -79,7 +76,6 @@ export const CourseProgressButton = ({
       setIsModalOpen(true)
     }
   }
-  // --- END OF CHANGE ---
 
   const onConfirm = () => {
     if (dontShowAgain) {
@@ -98,7 +94,7 @@ export const CourseProgressButton = ({
     )
   }
 
-  // --- START OF CHANGE: The AlertDialog is now controlled by state ---
+
   // The Button is now separate from the AlertDialog component itself.
   return (
     <>
@@ -136,5 +132,4 @@ export const CourseProgressButton = ({
       </AlertDialog>
     </>
   )
-  // --- END OF CHANGE ---
 }
