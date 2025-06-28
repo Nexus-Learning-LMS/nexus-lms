@@ -25,7 +25,7 @@ export const Navbar = () => {
       <div className="relative z-10 p-4 h-full flex items-center justify-between">
         {/* --- Left Section (1/3) --- */}
         {/* Left Section: Always contains the logo */}
-        <div className="flex-1 flex justify-start">
+        <div className="flex-1 flex justify-start pr-5">
           <Logo />
         </div>
 

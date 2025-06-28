@@ -38,10 +38,10 @@ export default async function Home() {
       <section className="min-h-screen grid grid-cols-1 md:grid-cols-2">
         <div className="flex md:col-span-1 items-center justify-center bg-brand-primary-blue text-white p-8 pt-28 md:p-12 lg:p-16">
           <div className="max-w-lg space-y-6">
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight cursor-default">
+            <h1 className="text-3xl md:text-4xl min-[1100px]:text-5xl font-bold leading-tight cursor-default">
               More than Tuition - its a Transformation.
             </h1>
-            <p className="text-lg text-slate-300 cursor-default">
+            <p className=" text-slate-300 cursor-default">
               Improvement isn't a promise here, it's a pattern. We track growth, celebrate wins, and keep moving
               forward.
             </p>
