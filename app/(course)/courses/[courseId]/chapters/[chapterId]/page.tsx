@@ -12,18 +12,16 @@ import { CourseEnrollButton } from './_components/course-enroll-button'
 import { CourseProgressButton } from './_components/course-progress-button'
 
 interface ChapterIdPageProps {
-  params: {
+  params: Promise<{
     courseId: string
     chapterId: string
-  }
+  }>
 }
+// --- END OF FIX ---
 
-// --- START OF FIX ---
-// The component now accepts the entire `props` object, instead of destructuring { params } directly.
-// This satisfies the strict type-checking that Vercel's build process enforces.
-const ChapterIdPage = async (props: ChapterIdPageProps) => {
-  // We now get `params` from the props object inside the function body.
-  const { params } = props
+const ChapterIdPage = async ({ params: paramsPromise }: ChapterIdPageProps) => {
+  // --- START OF FIX: We now await the params to resolve them ---
+  const params = await paramsPromise
   const { userId } = await auth()
 
   if (!userId) {
