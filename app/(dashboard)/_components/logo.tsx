@@ -15,7 +15,7 @@ export const Logo = () => {
     <Link href="/">
       <div className="flex items-center cursor-pointer transition-opacity hover:opacity-75">
         <div className="relative h-8 w-8 min-[350px]:h-10 min-[350px]:w-10 min-[1100px]:h-12 min-[1100px]:w-12">
-          <Image fill src="/nexus-logo.PNG" alt="Logo" />
+          <Image fill src="/nexus-logo.png" alt="Logo" />
         </div>
         <h3
           className={cn(
