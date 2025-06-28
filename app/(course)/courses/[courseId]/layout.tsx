@@ -7,7 +7,16 @@ import { getProgress } from '@/actions/get-progress'
 import { CourseSidebar } from './_components/course-sidebar'
 import { CourseNavbar } from './_components/course-navbar'
 
-const CourseLayout = async ({ children, params }: { children: React.ReactNode; params: { courseId: string } }) => {
+interface CourseLayoutProps {
+  children: React.ReactNode
+  params: Promise<{
+    courseId: string
+  }>
+}
+
+const CourseLayout = async ({ children, params: paramsPromise }: CourseLayoutProps) => {
+  // Await the promise to get the resolved params object
+  const params = await paramsPromise
   const { userId } = await auth()
 
   if (!userId) {
@@ -75,7 +84,7 @@ const CourseLayout = async ({ children, params }: { children: React.ReactNode; p
       }
     })
   }
-  
+
   return (
     <div className="h-full">
       <div className="h-[80px] md:pl-80 fixed inset-y-0 w-full z-50">
