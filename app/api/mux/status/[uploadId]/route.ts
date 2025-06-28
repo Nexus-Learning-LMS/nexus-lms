@@ -3,7 +3,8 @@ import Mux from '@mux/mux-node'
 
 const { Video } = new Mux(process.env.MUX_TOKEN_ID!, process.env.MUX_TOKEN_SECRET!)
 
-export async function GET(req: Request, { params }: { params: { uploadId: string } }) {
+export async function GET(req: Request, { params: paramsPromise }: { params: Promise<{ uploadId: string }> }) {
+  const params = await paramsPromise
   try {
     const upload = await Video.Uploads.get(params.uploadId)
 

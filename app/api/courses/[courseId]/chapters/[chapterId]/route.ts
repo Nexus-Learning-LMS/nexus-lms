@@ -6,7 +6,11 @@ import { db } from '@/lib/db'
 
 const { Video } = new Mux(process.env.MUX_TOKEN_ID!, process.env.MUX_TOKEN_SECRET!)
 
-export async function DELETE(req: Request, { params }: { params: { courseId: string; chapterId: string } }) {
+export async function DELETE(
+  req: Request,
+  { params: paramsPromise }: { params: Promise<{ courseId: string; chapterId: string }> },
+) {
+  const params = await paramsPromise
   try {
     const { userId } = await auth()
 
@@ -84,7 +88,11 @@ export async function DELETE(req: Request, { params }: { params: { courseId: str
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: { courseId: string; chapterId: string } }) {
+export async function PATCH(
+  req: Request,
+  { params: paramsPromise }: { params: Promise<{ courseId: string; chapterId: string }> },
+) {
+  const params = await paramsPromise
   try {
     const { userId } = await auth()
     const { isPublished, playbackId, assetId, videoUrl, ...values } = await req.json()
@@ -189,7 +197,11 @@ export async function PATCH(req: Request, { params }: { params: { courseId: stri
 
 // GET handler to support axios.get from frontend
 
-export async function GET(req: Request, { params }: { params: { courseId: string; chapterId: string } }) {
+export async function GET(
+  req: Request,
+  { params: paramsPromise }: { params: Promise<{ courseId: string; chapterId: string }> },
+) {
+  const params = await paramsPromise
   try {
     const chapter = await db.chapter.findUnique({
       where: {

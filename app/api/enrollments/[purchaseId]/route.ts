@@ -3,7 +3,8 @@ import { auth } from '@clerk/nextjs/server'
 import { db } from '@/lib/db'
 
 // Revoke access by deleting a Purchase record
-export async function DELETE(req: Request, { params }: { params: { purchaseId: string } }) {
+export async function DELETE(req: Request, { params: paramsPromise }: { params: Promise<{ purchaseId: string }> }) {
+  const params = await paramsPromise
   try {
     // const { sessionClaims } = auth()
     // if (sessionClaims?.metadata?.role !== 'admin') {

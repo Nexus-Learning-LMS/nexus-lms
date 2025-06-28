@@ -3,7 +3,11 @@ import { NextResponse } from 'next/server'
 
 import { db } from '@/lib/db'
 
-export async function PATCH(req: Request, { params }: { params: { courseId: string; chapterId: string } }) {
+export async function PATCH(
+  req: Request,
+  { params: paramsPromise }: { params: Promise<{ courseId: string; chapterId: string }> },
+) {
+  const params = await paramsPromise
   try {
     const { userId } = await auth()
 
