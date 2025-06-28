@@ -3,8 +3,11 @@ import { NextResponse } from 'next/server'
 
 import { db } from '@/lib/db'
 
-export async function DELETE(req: Request, context: { params: { courseId: string; attachmentId: string } }) {
-  const { params } = context
+export async function DELETE(
+  req: Request,
+  { params: paramsPromise }: { params: Promise<{ courseId: string; attachmentId: string }> },
+) {
+  const params = await paramsPromise
   try {
     const { userId } = await auth()
 
