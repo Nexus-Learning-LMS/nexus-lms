@@ -42,8 +42,8 @@ export default async function Home() {
               More than Tuition - its a Transformation.
             </h1>
             <p className=" text-slate-300 cursor-default">
-              Improvement isn't a promise here, it's a pattern. We track growth, celebrate wins, and keep moving
-              forward.
+              Improvement isn&apos;t a promise here, it&apos;s a pattern. We track growth, celebrate wins, and keep
+              moving forward.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link href="/search">

@@ -108,7 +108,8 @@ const ContactPage = () => {
       <div className="w-full bg-brand-primary-blue p-8 md:p-12 text-center">
         <h1 className="text-3xl md:text-4xl font-bold text-white">Get In Touch</h1>
         <p className="text-slate-200 mt-2 max-w-2xl mx-auto">
-          Fill out the form below to start your learning journey. We'll contact you to complete the enrollment process.
+          Fill out the form below to start your learning journey. We&apos;ll contact you to complete the enrollment
+          process.
         </p>
       </div>
 

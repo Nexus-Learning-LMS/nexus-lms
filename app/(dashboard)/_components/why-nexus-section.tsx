@@ -106,7 +106,8 @@ export const WhyNexusSection = () => {
         <div className="text-center mb-12 md:mb-16 cursor-default">
           <h2 className="text-3xl md:text-4xl font-bold text-brand-dark-blue">Why Nexus Learning?</h2>
           <p className="text-slate-500 mt-2 max-w-2xl mx-auto">
-            We've built a learning environment that prioritizes personal growth, expert guidance, and real-world skills.
+            We&apos;ve built a learning environment that prioritizes personal growth, expert guidance, and real-world
+            skills.
           </p>
         </div>
 

@@ -6,16 +6,16 @@ const PrivacyPolicyPage = () => {
       {/* Blue Header Section */}
       <div className="w-full bg-brand-primary-blue p-8 md:p-12 text-center">
         <h1 className="text-3xl md:text-4xl font-bold text-white">Privacy Policy</h1>
-        <p className="text-slate-200 mt-2">Effective Date: 19/06/2025</p>
+        <p className="text-slate-200 mt-2">Effective Date: 26/06/2025</p>
       </div>
 
       {/* Main Content Section */}
       <div className="max-w-4xl mx-auto p-6 md:p-10 text-slate-700">
         <div className="space-y-8 md:pb-16">
           <p className="text-lg">
-            Welcome to Nexus Learning ("we," "our," or "us"). Your privacy is important to us. This Privacy Policy
-            explains how we collect, use, disclose, and safeguard your information when you visit our website (the
-            "Site") and use our services.
+            Welcome to Nexus Learning (&quot;we,&quot; &quot;our,&quot; or &quot;us&quot;). Your privacy is important to
+            us. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you
+            visit our website (the &quot;Site&quot;) and use our services.
           </p>
           <p>
             By accessing or using our Site, you agree to this Privacy Policy. If you do not agree with its terms, please
@@ -155,7 +155,7 @@ const PrivacyPolicyPage = () => {
             <h2 className="text-2xl font-bold text-brand-deep-blue">10. Changes to This Privacy Policy</h2>
             <p>
               We may update this Privacy Policy from time to time. We will notify you of any significant changes by
-              posting the updated policy on this page with a new "Effective Date."
+              posting the updated policy on this page with a new &quot;Effective Date.&quot;
             </p>
           </section>
 
