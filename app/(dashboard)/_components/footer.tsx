@@ -23,7 +23,7 @@ export const Footer = () => {
                 <Mail className="h-6 w-6" />
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/nexuslearningofficial"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-slate-400 hover:text-white transition"

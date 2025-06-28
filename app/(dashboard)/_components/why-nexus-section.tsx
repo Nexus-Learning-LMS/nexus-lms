@@ -48,11 +48,11 @@ const collageImages = [
   },
   {
     src: '/why-nexus/wn-5.png',
-    alt: 'image-4',
+    alt: 'image-5',
   },
   {
     src: '/why-nexus/wn-2.png',
-    alt: 'image-4',
+    alt: 'image-2',
   },
   {
     src: '/why-nexus/wn-4.png',
@@ -60,7 +60,7 @@ const collageImages = [
   },
   {
     src: '/why-nexus/wn-6.png',
-    alt: 'image-4',
+    alt: 'image-6',
   },
 ]
 
