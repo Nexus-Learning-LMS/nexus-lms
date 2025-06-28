@@ -17,10 +17,13 @@ interface ChapterIdPageProps {
     chapterId: string
   }
 }
-// --- END OF FIX ---
 
-// --- START OF FIX: Apply the new interface to the component ---
-const ChapterIdPage = async ({ params }: ChapterIdPageProps) => {
+// --- START OF FIX ---
+// The component now accepts the entire `props` object, instead of destructuring { params } directly.
+// This satisfies the strict type-checking that Vercel's build process enforces.
+const ChapterIdPage = async (props: ChapterIdPageProps) => {
+  // We now get `params` from the props object inside the function body.
+  const { params } = props
   const { userId } = await auth()
 
   if (!userId) {
