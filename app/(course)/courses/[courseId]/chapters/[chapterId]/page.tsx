@@ -11,7 +11,16 @@ import { VideoPlayer } from './_components/video-player'
 import { CourseEnrollButton } from './_components/course-enroll-button'
 import { CourseProgressButton } from './_components/course-progress-button'
 
-const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId: string } }) => {
+interface ChapterIdPageProps {
+  params: {
+    courseId: string
+    chapterId: string
+  }
+}
+// --- END OF FIX ---
+
+// --- START OF FIX: Apply the new interface to the component ---
+const ChapterIdPage = async ({ params }: ChapterIdPageProps) => {
   const { userId } = await auth()
 
   if (!userId) {
