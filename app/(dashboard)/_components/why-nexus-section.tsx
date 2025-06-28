@@ -39,28 +39,28 @@ const features = [
 
 const collageImages = [
   {
-    src: '/img-cute.jpg',
-    alt: 'Student coding on a laptop',
+    src: '/why-nexus/wn-3.png',
+    alt: 'image-3',
   },
   {
-    src: '/img-donut.jpg',
-    alt: 'Two people collaborating on a project',
+    src: '/why-nexus/wn-1.png',
+    alt: 'image-1',
   },
   {
-    src: '/img-ocean.jpg',
-    alt: 'Group of students learning together',
+    src: '/why-nexus/wn-5.png',
+    alt: 'image-4',
   },
   {
-    src: '/img-peacock.jpg',
-    alt: 'Close-up of code on a screen',
+    src: '/why-nexus/wn-2.png',
+    alt: 'image-4',
   },
   {
-    src: '/img-waves.jpg',
-    alt: 'A mentor guiding a student in an office',
+    src: '/why-nexus/wn-4.png',
+    alt: 'image-4',
   },
   {
-    src: '/img-trees.jpg',
-    alt: 'Team meeting and discussion',
+    src: '/why-nexus/wn-6.png',
+    alt: 'image-4',
   },
 ]
 
