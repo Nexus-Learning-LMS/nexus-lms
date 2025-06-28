@@ -85,7 +85,12 @@ const ChapterIdPage = async ({ params }: { params: { courseId: string; chapterId
           <Separator className=" bg-slate-400" />
           <div>
             <p className="text-lg pl-4 pt-4 font-medium text-brand-dark-blue">Chapter Description:</p>
-            <Preview value={chapter.description!} />
+            {/* Conditionally render the Preview component or a placeholder */}
+            {chapter.description ? (
+              <Preview value={chapter.description} />
+            ) : (
+              <p className="text-sm text-slate-500 italic px-4 py-2">N/A</p>
+            )}
           </div>
           {!!attachments.length && (
             <>
