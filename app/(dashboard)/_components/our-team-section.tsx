@@ -90,7 +90,8 @@ export const OurTeamSection = () => {
             </ul>
 
             <blockquote className="border-l-4 border-brand-primary-blue pl-4 italic text-slate-700">
-              “We are not just shaping scholars; we are shaping confidence, clarity, and curiosity in every learner.”
+              &quot;We are not just shaping scholars; we are shaping confidence, clarity, and curiosity in every
+              learner.&quot;
               <cite className="block not-italic mt-2 text-sm font-semibold text-brand-dark-blue">
                 – The Nexus Mentor Team
               </cite>
