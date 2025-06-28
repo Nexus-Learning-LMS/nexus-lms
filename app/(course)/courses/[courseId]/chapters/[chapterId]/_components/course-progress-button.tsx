@@ -112,7 +112,7 @@ export const CourseProgressButton = ({
             <AlertDialogTitle>Confirm Completion</AlertDialogTitle>
             <AlertDialogDescription>
               Please ensure you have watched the lecture and taken notes; once you proceed, you may lose access to this
-              one. Confirm by selecting &quot;Yes.&quot;
+              one. Confirm by selecting Yes.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex items-center space-x-2 my-4">

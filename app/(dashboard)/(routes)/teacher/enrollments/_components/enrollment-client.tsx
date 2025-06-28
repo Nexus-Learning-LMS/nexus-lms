@@ -213,8 +213,8 @@ export const EnrollmentClient = () => {
               {modalData?.action === 'grant' ? 'Confirm Enrollment' : 'Confirm Revocation'}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to {modalData?.action === 'grant' ? 'GRANT access to' : 'REVOKE access from'} &quot;
-              {modalData?.course.title}&quot; for {foundUser?.name || foundUser?.email}?
+              Are you sure you want to {modalData?.action === 'grant' ? 'GRANT access to' : 'REVOKE access from'}
+              {modalData?.course.title} for {foundUser?.name || foundUser?.email}?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

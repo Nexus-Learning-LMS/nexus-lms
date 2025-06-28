@@ -78,7 +78,7 @@ export const Footer = () => {
           {/* Column 3: Get in Touch */}
           <div>
             <h3 className="font-semibold text-lg mb-4">Get in Touch</h3>
-            <p className="text-slate-400">Have questions? We&apos;d love to hear from you.</p>
+            <p className="text-slate-400">Have questions? We would love to hear from you.</p>
             <Link href="/contact">
               <Button className="mt-4 bg-brand-primary-blue hover:bg-brand-dark-blue w-full md:w-auto">
                 Contact Us
