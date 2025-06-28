@@ -17,10 +17,8 @@ interface ChapterIdPageProps {
     chapterId: string
   }>
 }
-// --- END OF FIX ---
 
 const ChapterIdPage = async ({ params: paramsPromise }: ChapterIdPageProps) => {
-  // --- START OF FIX: We now await the params to resolve them ---
   const params = await paramsPromise
   const { userId } = await auth()
 
