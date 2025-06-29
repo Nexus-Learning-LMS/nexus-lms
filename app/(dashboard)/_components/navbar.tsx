@@ -15,7 +15,7 @@ export const Navbar = () => {
     <div className={cn('h-full relative', !isHomepage && 'bg-brand-deep-blue')}>
       {/* This div creates the split background, visible only on desktop homepage. */}
       {isHomepage && (
-        <div className="absolute inset-0 h-full w-full hidden md:flex" aria-hidden="true">
+        <div className="absolute inset-0 h-full w-full hidden min-[890px]:flex" aria-hidden="true">
           <div className="w-1/2 h-full bg-brand-primary-blue" />
           <div className="w-1/2 h-full bg-white" />
         </div>
@@ -28,18 +28,17 @@ export const Navbar = () => {
         <div className="flex-1 flex justify-start pr-5">
           <Logo />
         </div>
-
         {/* Middle Section: Contains the main navigation links, hidden on mobile */}
-        <div className="hidden md:flex flex-1 justify-center">
+        <div className="hidden min-[890px]:flex flex-1 justify-center">
           <NavbarRoutes />
         </div>
-
         {/* Right Section: Contains auth buttons on desktop and the hamburger menu on mobile */}
         <div className="flex-1 flex justify-end">
-          <div className="hidden md:flex">
+          <div className="hidden min-[890px]:flex">
             <NavbarRoutes isAuthSection={true} />
           </div>
-          <div className="md:hidden">
+
+          <div className="min-[890px]:hidden">
             <MobileSidebar />
           </div>
         </div>

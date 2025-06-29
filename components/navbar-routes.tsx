@@ -139,7 +139,7 @@ export const NavbarRoutes = ({ isAuthSection = false }: { isAuthSection?: boolea
 
   // The main container now has a larger gap to create the center divide
   return (
-    <div className="flex min-[1500px]:gap-x-12 min-[1100px]:gap-x-6 min-[900px]:gap-x-3 md:gap-x-1">
+    <div className="flex min-[1500px]:gap-x-12 min-[1100px]:gap-x-6 min-[900px]:gap-x-3  min-[890px]:gap-x-1">
       {isTeacherPage ? (
         teacherRoutes.map((route) => <NavLink key={route.href} href={route.href} label={route.label} />)
       ) : (
