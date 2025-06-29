@@ -1,26 +1,18 @@
 'use client'
 
-import { AppProgressBar as ProgressBar } from 'next-nprogress-bar'
+// Correctly import ProgressProvider from the '/app' entry point for the App Router
+import { ProgressProvider } from '@bprogress/next/app'
 
 export const NProgressProvider = ({ children }: { children: React.ReactNode }) => {
   return (
-    <>
-      <style jsx global>{`
-        #nprogress {
-          pointer-events: none;
-        }
-        #nprogress .bar {
-          background: #011f9f !important; /* Your brand-primary-blue color */
-          position: fixed !important;
-          z-index: 99999 !important; /* A very high z-index */
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 4px;
-        }
-      `}</style>
-      <ProgressBar height="4px" color="#011f9f" options={{ showSpinner: false }} shallowRouting />
+    // The ProgressProvider now wraps your application's children
+    <ProgressProvider
+      height="4px"
+      color="linear-gradient(to right, #3b82f6, #60a5fa)"
+      options={{ showSpinner: false }}
+      shallowRouting
+    >
       {children}
-    </>
+    </ProgressProvider>
   )
 }

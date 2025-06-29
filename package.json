@@ -10,6 +10,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@bprogress/next": "^3.2.12",
     "@clerk/nextjs": "^6.20.2",
     "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^5.0.1",
@@ -39,7 +40,6 @@
     "eslint-config-next": "^15.3.3",
     "lucide-react": "^0.517.0",
     "next": "^15.3.3",
-    "next-nprogress-bar": "^2.4.7",
     "next-video": "^2.2.0",
     "query-string": "^9.2.0",
     "react": "19.1.0",
