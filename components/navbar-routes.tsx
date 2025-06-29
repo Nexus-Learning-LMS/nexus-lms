@@ -42,6 +42,7 @@ export const NavbarRoutes = ({ isAuthSection = false }: { isAuthSection?: boolea
   const isTeacher = checkIsTeacher(userId) // Use the new helper function
   const isTeacherPage = pathname?.startsWith('/teacher')
   const isCoursePage = pathname?.includes('/courses')
+  const isContactPage = pathname === '/contact'
 
   const NavLink = ({ href, label, isDarkText = false }: { href: string; label: string; isDarkText?: boolean }) => {
     const isAnchorLink = href.startsWith('/#')
@@ -55,12 +56,22 @@ export const NavbarRoutes = ({ isAuthSection = false }: { isAuthSection?: boolea
       isActive = false
     }
 
+    const handleClick = () => {
+      // If it's an anchor link, manually update the state
+      if (isAnchorLink) {
+        setActiveHash(href.slice(1))
+      } else {
+        // For regular pages, clear the hash
+        setActiveHash('')
+      }
+    }
+
     const linkColor = isHomepage && isDarkText ? 'text-brand-deep-blue' : 'text-white'
     const hoverColor = isHomepage && isDarkText ? 'hover:bg-slate-100' : 'hover:bg-white/10'
     const activeBg = isHomepage && isDarkText ? 'bg-slate-200' : 'bg-white/20'
 
     return (
-      <Link href={href}>
+      <Link href={href} onClick={handleClick}>
         <div
           className={cn(
             'px-4 py-2 rounded-md text-sm font-medium transition-all whitespace-nowrap',
@@ -102,11 +113,12 @@ export const NavbarRoutes = ({ isAuthSection = false }: { isAuthSection?: boolea
             <Link href="/contact">
               <Button
                 size="sm"
-                className={
-                  isHomepage
-                    ? 'text-white hover:bg-brand-deep-blue bg-brand-primary-blue'
-                    : 'text-white hover:bg-white/10'
-                }
+                variant="ghost"
+                className={cn(
+                  'transition-all',
+                  isHomepage ? 'text-brand-deep-blue hover:bg-slate-100' : 'text-white hover:bg-white/10',
+                  isContactPage && (isHomepage ? 'bg-slate-200' : 'bg-white/20'),
+                )}
               >
                 Contact Us
               </Button>
