@@ -1,10 +1,23 @@
 'use client'
 
-import { Menu, Layout, Compass, User, UserIcon, Award, Users, List, BarChart, BookUser, LogOut } from 'lucide-react'
+import {
+  Menu,
+  Layout,
+  Compass,
+  User,
+  UserIcon,
+  Award,
+  Users,
+  List,
+  BarChart,
+  BookUser,
+  LogOut,
+  Settings,
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { UserButton, useAuth, useUser } from '@clerk/nextjs'
+import { UserButton, useAuth, useUser, useClerk } from '@clerk/nextjs'
 import Image from 'next/image'
 
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
@@ -30,7 +43,8 @@ const teacherMobileRoutes = [
 export const MobileSidebar = () => {
   const pathname = usePathname()
   const { userId, signOut } = useAuth()
-  const { user } = useUser() // Hook to get user details like name
+  const { user } = useUser()
+  const { openUserProfile } = useClerk()
   const [isOpen, setIsOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
   const router = useRouter()
@@ -54,6 +68,11 @@ export const MobileSidebar = () => {
   const handleSignOut = () => {
     setIsOpen(false)
     signOut(() => router.push('/'))
+  }
+
+  const handleManageAccount = () => {
+    setIsOpen(false)
+    openUserProfile()
   }
 
   return (
@@ -90,12 +109,22 @@ export const MobileSidebar = () => {
                 </Link>
               )
             })}
-            {/* Conditionally add Teacher Mode link */}
-            {isTeacher && !isTeacherPage && (
-              <Link href="/teacher/courses" onClick={() => setIsOpen(false)}>
+
+            {userId && (
+              <div
+                onClick={handleManageAccount}
+                className="flex items-center gap-x-2 p-3 rounded-md text-slate-300 text-sm font-medium transition-all hover:bg-white/10 hover:text-white cursor-pointer"
+              >
+                <Settings className="h-5 w-5 mr-2" />
+                Manage Account
+              </div>
+            )}
+
+            {isTeacher && (
+              <Link href={isTeacherPage ? '/' : '/teacher/courses'} onClick={() => setIsOpen(false)}>
                 <div className="flex items-center gap-x-2 p-3 rounded-md text-slate-300 text-sm font-medium transition-all hover:bg-white/10 hover:text-white">
                   <LogOut className="h-5 w-5 mr-2" />
-                  Teacher Mode
+                  {isTeacherPage ? 'Exit Teacher Mode' : 'Teacher Mode'}
                 </div>
               </Link>
             )}

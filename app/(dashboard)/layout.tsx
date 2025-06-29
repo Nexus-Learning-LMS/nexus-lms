@@ -1,5 +1,5 @@
 import { Navbar } from './_components/navbar'
-import { Footer } from './_components/footer' // Import the new Footer
+import { Footer } from './_components/footer' 
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (
