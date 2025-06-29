@@ -3,6 +3,7 @@ import { Inter, Poppins } from 'next/font/google'
 import { ClerkProvider, SignInButton, SignUpButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import { ToastProvider } from '@/components/providers/toaster-provider'
 import { ConfettiProvider } from '@/components/providers/confetti-provider'
+import { NProgressProvider } from '@/components/providers/nprogress-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 const poppins = Poppins({
@@ -20,9 +21,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <ClerkProvider afterSignOutUrl="/">
       <html lang="en">
         <body className={poppins.className}>
-          <ConfettiProvider />
-          <ToastProvider />
-          {children}
+          <NProgressProvider>
+            <ConfettiProvider />
+            <ToastProvider />
+            {children}
+          </NProgressProvider>
         </body>
       </html>
     </ClerkProvider>

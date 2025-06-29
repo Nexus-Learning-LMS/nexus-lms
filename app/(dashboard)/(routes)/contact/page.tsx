@@ -90,7 +90,7 @@ const ContactPage = () => {
 
       const result = await response.json()
       if (result.success) {
-        toast.success('Inquiry received! We will contact you shortly.')
+        toast.success('Inquiry sent! We will contact you shortly.')
         form.reset()
       } else {
         throw new Error(result.message || 'Failed to send inquiry.')
