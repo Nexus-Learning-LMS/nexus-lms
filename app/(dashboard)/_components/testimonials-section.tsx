@@ -1,7 +1,7 @@
 'use client'
 
 import { Star } from 'lucide-react'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { cn } from '@/lib/utils'
 
 const testimonials = [
@@ -74,18 +74,7 @@ const testimonials = [
 
 export const TestimonialsSection = () => {
   const extendedTestimonials = [...testimonials, ...testimonials]
-  const [isInteracting, setIsInteracting] = useState(false)
-  const interactionTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-  const handleInteraction = () => {
-    setIsInteracting(true)
-    if (interactionTimeoutRef.current) {
-      clearTimeout(interactionTimeoutRef.current)
-    }
-    interactionTimeoutRef.current = setTimeout(() => {
-      setIsInteracting(false)
-    }, 5000) // Resume after 5 seconds of inactivity
-  }
+  const [isPaused, setIsPaused] = useState(false)
 
   return (
     <section id="testimonials" className="py-16 md:py-24 bg-white">
@@ -109,42 +98,35 @@ export const TestimonialsSection = () => {
         </div>
 
         <div
-          className="relative w-full overflow-hidden group"
+          className="relative w-full overflow-hidden"
           style={{
             maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)',
           }}
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
         >
-          {/* --- START OF FIX: Separated scrolling container from animated container --- */}
-          <div className="overflow-x-auto pb-4" onScroll={handleInteraction} onTouchStart={handleInteraction}>
-            <div
-              className={cn(
-                'flex w-max', // w-max ensures the container is wide enough for all items
-                !isInteracting && 'animate-scroll group-hover:animate-pause',
-              )}
-            >
-              {extendedTestimonials.map((testimonial, index) => (
-                <div
-                  key={index}
-                  className="flex-shrink-0 w-80 h-64 mx-4 p-6 bg-slate-50 rounded-lg border border-slate-200 shadow-md flex flex-col"
-                >
-                  <div className="flex items-center mb-4">
-                    {Array(5)
-                      .fill(0)
-                      .map((_, i) => (
-                        <Star key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400" />
-                      ))}
-                  </div>
-                  <blockquote className="text-slate-600 text-xs italic flex-grow overflow-y-auto">
-                    &quot;{testimonial.message}&quot;
-                  </blockquote>
-                  <div className="mt-4 pt-4 border-t border-slate-200">
-                    <p className="font-semibold text-brand-deep-blue">{testimonial.name}</p>
-                  </div>
+          <div className="flex w-max animate-scroll" style={{ animationPlayState: isPaused ? 'paused' : 'running' }}>
+            {extendedTestimonials.map((testimonial, index) => (
+              <div
+                key={index}
+                className="flex-shrink-0 w-80 h-64 mx-4 p-6 bg-slate-50 rounded-lg border border-slate-200 shadow-md flex flex-col"
+              >
+                <div className="flex items-center mb-4">
+                  {Array(5)
+                    .fill(0)
+                    .map((_, i) => (
+                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-yellow-400" />
+                    ))}
                 </div>
-              ))}
-            </div>
+                <blockquote className="text-slate-600 text-xs italic flex-grow overflow-y-auto">
+                  &quot;{testimonial.message}&quot;
+                </blockquote>
+                <div className="mt-4 pt-4 border-t border-slate-200">
+                  <p className="font-semibold text-brand-deep-blue">{testimonial.name}</p>
+                </div>
+              </div>
+            ))}
           </div>
-          {/* --- END OF FIX --- */}
         </div>
       </div>
     </section>
