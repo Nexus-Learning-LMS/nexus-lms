@@ -62,23 +62,21 @@ const CourseLayout = async ({ children, params: paramsPromise }: CourseLayoutPro
   // Apply the rolling window logic
   if (hasPurchased) {
     const paidChapters = course.chapters.filter((chapter) => !chapter.isFree)
-    const completedPaidChapters = paidChapters.filter((chapter) => chapter.userProgress?.[0]?.isCompleted)
 
-    // Find the position of the last completed non-free chapter.
-    // If none are complete, this will be -1, so the window starts at chapter 0.
-    const lastCompletedPosition =
-      completedPaidChapters.length > 0 ? Math.max(...completedPaidChapters.map((c) => c.position)) : -1
-
-    // The window of unlocked chapters starts after the last completed one.
-    const unlockWindowStart = paidChapters.findIndex((c) => c.position > lastCompletedPosition)
+    // Find the index of the first paid chapter that is NOT completed.
+    // This is the anchor for our rolling window.
+    const firstUncompletedIndex = paidChapters.findIndex((chapter) => !chapter.userProgress?.[0]?.isCompleted)
 
     course.chapters.forEach((chapter) => {
       if (!chapter.isFree) {
         const chapterIndexInPaidList = paidChapters.findIndex((c) => c.id === chapter.id)
-        // A chapter is locked if it's outside the 3-chapter window
-        const isLocked = chapterIndexInPaidList < unlockWindowStart || chapterIndexInPaidList >= unlockWindowStart + 3
-        // We attach our calculated lock status to the chapter object.
-        // The 'any' type is used here to dynamically add a property.
+
+        // A chapter is locked if its index is outside the 3-chapter window
+        // that starts at the first uncompleted chapter.
+        const isLocked =
+          firstUncompletedIndex !== -1 &&
+          (chapterIndexInPaidList < firstUncompletedIndex || chapterIndexInPaidList >= firstUncompletedIndex + 3)
+
         ;(chapter as any).isLocked = isLocked
       } else {
         ;(chapter as any).isLocked = false // Free chapters are never locked

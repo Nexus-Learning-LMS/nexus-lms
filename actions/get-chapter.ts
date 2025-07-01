@@ -13,12 +13,13 @@ export const getChapter = async ({
   chapterId,
 }: GetChapterProps): Promise<{
   chapter: Chapter | null
-  course: Course | null
+  course: (Course & { chapters: Chapter[] }) | null
   muxData: MuxData | null
   attachments: Attachment[]
   nextChapter: Chapter | null
   userProgress: UserProgress | null
   purchase: Purchase | null
+  isLocked: boolean
 }> => {
   try {
     const purchase = await db.purchase.findUnique({
@@ -70,19 +71,20 @@ export const getChapter = async ({
       })
 
       const paidChapters = course.chapters.filter((c) => !c.isFree)
-      const completedPaidChapters = paidChapters.filter((c) =>
-        allUserProgress.some((p) => p.chapterId === c.id && p.isCompleted),
+      const firstUncompletedIndex = paidChapters.findIndex(
+        (c) => !allUserProgress.some((p) => p.chapterId === c.id && p.isCompleted),
       )
 
-      const lastCompletedPosition =
-        completedPaidChapters.length > 0 ? Math.max(...completedPaidChapters.map((c) => c.position)) : -1
-
-      const unlockWindowStart = paidChapters.findIndex((c) => c.position > lastCompletedPosition)
       const chapterIndexInPaidList = paidChapters.findIndex((c) => c.id === chapter.id)
 
-      // Update the lock status based on the windowing logic
       if (!chapter.isFree) {
-        isLocked = chapterIndexInPaidList < unlockWindowStart || chapterIndexInPaidList >= unlockWindowStart + 3
+        // If all paid chapters are complete, lock them all. Otherwise, apply window logic.
+        if (firstUncompletedIndex === -1) {
+          isLocked = true
+        } else {
+          isLocked =
+            chapterIndexInPaidList < firstUncompletedIndex || chapterIndexInPaidList >= firstUncompletedIndex + 3
+        }
       }
     }
 
@@ -119,6 +121,7 @@ export const getChapter = async ({
       nextChapter,
       userProgress,
       purchase,
+      isLocked,
     }
   } catch (error) {
     console.log('[GET_CHAPTER]', error)
@@ -130,6 +133,7 @@ export const getChapter = async ({
       nextChapter: null,
       userProgress: null,
       purchase: null,
+      isLocked: true,
     }
   }
 }

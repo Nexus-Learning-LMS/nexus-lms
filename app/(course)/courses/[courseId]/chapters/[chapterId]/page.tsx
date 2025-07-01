@@ -26,7 +26,7 @@ const ChapterIdPage = async ({ params: paramsPromise }: ChapterIdPageProps) => {
     return redirect('/')
   }
 
-  const { chapter, course, muxData, attachments, nextChapter, userProgress, purchase } = await getChapter({
+  const { chapter, course, muxData, attachments, nextChapter, userProgress, purchase, isLocked } = await getChapter({
     userId,
     chapterId: params.chapterId,
     courseId: params.courseId,
@@ -36,7 +36,7 @@ const ChapterIdPage = async ({ params: paramsPromise }: ChapterIdPageProps) => {
     return redirect('/')
   }
 
-  const isLocked = !chapter.isFree && !purchase
+  // const isLocked = !chapter.isFree && !purchase
   const completeOnEnd = !!purchase && !userProgress?.isCompleted
 
   return (
