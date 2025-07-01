@@ -73,7 +73,7 @@ const ChapterIdPage = async ({ params: paramsPromise }: ChapterIdPageProps) => {
   return (
     <>
       {!chapter.isPublished && (
-        <Banner variant="warning" label="This chapter is unpublished. It will not be visible in the course" />
+        <Banner variant="warning2" label="This chapter is unpublished. It will not be visible in the course" />
       )}
       <div className="p-6">
         <div className="flex items-center justify-between">
