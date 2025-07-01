@@ -40,7 +40,9 @@ const ContactPage = () => {
           value: course.id,
           label: course.title,
         }))
-        setCourses(formattedCourses)
+
+        const allOptions = [{ value: 'general_query', label: 'General Query' }, ...formattedCourses]
+        setCourses(allOptions)
       } catch (error) {
         toast.error('Could not load course list.')
       } finally {
@@ -184,7 +186,7 @@ const ContactPage = () => {
                     selected={field.value}
                     onChange={field.onChange}
                     className="w-full "
-                    placeholder={isFetchingCourses ? 'Loading courses...' : 'Select courses...'}
+                    placeholder={isFetchingCourses ? 'Loading courses...' : 'Select "General Query" or Pick Courses...'}
                   />
                   <FormMessage className="text-red-500 font-light" />
                 </FormItem>
