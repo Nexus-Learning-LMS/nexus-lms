@@ -6,6 +6,7 @@ import { getProgress } from '@/actions/get-progress'
 
 import { CourseSidebar } from './_components/course-sidebar'
 import { CourseNavbar } from './_components/course-navbar'
+import { CourseMobileSidebar } from './_components/course-mobile-sidebar'
 
 interface CourseLayoutProps {
   children: React.ReactNode
@@ -88,7 +89,9 @@ const CourseLayout = async ({ children, params: paramsPromise }: CourseLayoutPro
   return (
     <div className="h-full">
       <div className="h-[80px] md:pl-80 fixed inset-y-0 w-full z-50">
-        <CourseNavbar course={course} progressCount={progressCount} />
+        <CourseNavbar course={course} progressCount={progressCount}>
+          <CourseMobileSidebar course={course} progressCount={progressCount} />
+        </CourseNavbar>
       </div>
       <div className="hidden md:flex h-full w-80 flex-col fixed inset-y-0 z-50">
         <CourseSidebar course={course} progressCount={progressCount} />
