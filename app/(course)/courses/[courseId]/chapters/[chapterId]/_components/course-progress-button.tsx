@@ -47,11 +47,11 @@ export const CourseProgressButton = ({
     try {
       setIsLoading(true)
 
-      await axios.put(`/api/courses/${courseId}/chapters/${chapterId}/progress`, {
+      const response = await axios.put(`/api/courses/${courseId}/chapters/${chapterId}/progress`, {
         isCompleted: true,
       })
 
-      if (!isCompleted && !nextChapterId) {
+      if (response.data.courseCompleted) {
         confetti.onOpen()
       }
 
