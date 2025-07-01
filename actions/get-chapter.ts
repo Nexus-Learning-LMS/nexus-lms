@@ -20,7 +20,7 @@ export const getChapter = async ({
   userProgress: UserProgress | null
   purchase: Purchase | null
   isLocked: boolean
-  banner?: { variant: 'warning' | 'success' | 'warning2'; label: string } | null
+  banner?: { variant: 'warning' | 'success' | 'warning2' | 'info'; label: string } | null
 }> => {
   try {
     const purchase = await db.purchase.findUnique({
@@ -62,7 +62,7 @@ export const getChapter = async ({
     let attachments: Attachment[] = []
     let nextChapter: Chapter | null = null
     let userProgress = null
-    let banner: { variant: 'warning' | 'success' | 'warning2'; label: string } | null = null
+    let banner: { variant: 'warning' | 'success' | 'warning2' | 'info'; label: string } | null = null
 
     const hasPurchased = !!purchase
     let isLocked = !chapter.isFree && !hasPurchased
@@ -89,11 +89,12 @@ export const getChapter = async ({
             chapterIndexInPaidList < firstUncompletedIndex || chapterIndexInPaidList >= firstUncompletedIndex + 3
         }
       }
+
       if (isLocked) {
         if (isChapterCompleted) {
           banner = {
             variant: 'warning2',
-            label: 'You’ve finished this chapter, great job! It’s now locked as we move ahead — keep learning!',
+            label: 'You have finished this chapter, great job! It’s now locked as we move ahead — keep learning!',
           }
         } else {
           const prerequisiteIndex = chapterIndexInPaidList - 3
@@ -106,6 +107,12 @@ export const getChapter = async ({
               }
             }
           }
+        }
+      } else if (!isChapterCompleted && !chapter.isFree) {
+        banner = {
+          variant: 'info',
+          label:
+            'Before moving on, make sure you have understood the lecture and taken notes. Feel free to ask any questions at nexuslearning.team@gmail.com. Once you move ahead, you may lose access to this chapter — so take your time and learn well!',
         }
       }
     } else if (isLocked) {
