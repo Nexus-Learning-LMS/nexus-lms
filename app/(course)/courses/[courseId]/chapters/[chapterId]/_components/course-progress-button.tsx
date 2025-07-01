@@ -26,6 +26,7 @@ interface CourseProgressButtonProps {
   courseId: string
   isCompleted?: boolean
   nextChapterId?: string
+  isFree?: boolean
 }
 
 export const CourseProgressButton = ({
@@ -33,6 +34,7 @@ export const CourseProgressButton = ({
   courseId,
   isCompleted,
   nextChapterId,
+  isFree,
 }: CourseProgressButtonProps) => {
   const router = useRouter()
   const confetti = useConfettiStore()
@@ -67,12 +69,16 @@ export const CourseProgressButton = ({
   }
 
   const onClick = () => {
+    if (isFree) {
+      handleMarkComplete()
+      return
+    }
+
     const hasSkippedWarning = localStorage.getItem('skipChapterCompletionWarning') === 'true'
 
     if (hasSkippedWarning) {
       handleMarkComplete()
     } else {
-      // Manually trigger the modal to open
       setIsModalOpen(true)
     }
   }
@@ -82,7 +88,7 @@ export const CourseProgressButton = ({
       localStorage.setItem('skipChapterCompletionWarning', 'true')
     }
     handleMarkComplete()
-    setIsModalOpen(false) // Close the modal after confirming
+    setIsModalOpen(false)
   }
 
   if (isCompleted) {
@@ -93,7 +99,6 @@ export const CourseProgressButton = ({
       </Button>
     )
   }
-
 
   // The Button is now separate from the AlertDialog component itself.
   return (

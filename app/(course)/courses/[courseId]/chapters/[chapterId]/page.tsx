@@ -84,6 +84,7 @@ const ChapterIdPage = async ({ params: paramsPromise }: ChapterIdPageProps) => {
                 courseId={params.courseId}
                 nextChapterId={nextChapter?.id}
                 isCompleted={!!userProgress?.isCompleted}
+                isFree={chapter.isFree}
               />
             ) : (
               <CourseEnrollButton />
