@@ -3,6 +3,7 @@ import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 
 import { db } from '@/lib/db'
+import { isTeacher } from '@/lib/teacher'
 
 const { Video } = new Mux(process.env.MUX_TOKEN_ID!, process.env.MUX_TOKEN_SECRET!)
 
@@ -63,10 +64,28 @@ export async function PATCH(req: Request, { params: paramsPromise }: { params: P
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
+    // First, find the course without checking for ownership.
+    const courseToUpdate = await db.course.findUnique({
+      where: { id: courseId },
+    })
+
+    if (!courseToUpdate) {
+      return new NextResponse('Not found', { status: 404 })
+    }
+
+    // Now, check if the user is authorized.
+    const isOwner = courseToUpdate.userId === userId
+    const isAdmin = isTeacher(userId)
+
+    // An admin can edit if they are the owner OR if the course is published.
+    if (!isOwner && !(isAdmin && courseToUpdate.isPublished)) {
+      return new NextResponse('Unauthorized', { status: 401 })
+    }
+
+    // If authorized, perform the update.
     const course = await db.course.update({
       where: {
         id: courseId,
-        userId,
       },
       data: {
         ...values,

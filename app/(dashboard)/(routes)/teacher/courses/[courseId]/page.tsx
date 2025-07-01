@@ -4,6 +4,7 @@ import { CircleDollarSign, File, LayoutDashboard, ListChecks } from 'lucide-reac
 export const dynamic = 'force-dynamic'
 
 import { db } from '@/lib/db'
+import { isTeacher } from '@/lib/teacher'
 import { IconBadge } from '@/components/icon-badge'
 import { Banner } from '@/components/banner'
 
@@ -32,7 +33,6 @@ const CourseIdPage = async ({ params: paramsPromise }: CourseIdPageProps) => {
   const course = await db.course.findUnique({
     where: {
       id: params.courseId,
-      userId,
     },
     include: {
       chapters: {
@@ -47,6 +47,25 @@ const CourseIdPage = async ({ params: paramsPromise }: CourseIdPageProps) => {
       },
     },
   })
+
+  // If the course doesn't exist, redirect.
+  if (!course) {
+    return redirect('/')
+  }
+
+  // Now, perform the authorization check.
+  // The user is the owner of the course.
+  const isOwner = course.userId === userId
+  // The user is an admin (as defined by your helper).
+  const isAdmin = isTeacher(userId)
+
+  // An admin is authorized if they are the owner OR if the course is published.
+  // This allows any admin to edit a live course.
+  const isAuthorized = isOwner || (isAdmin && course.isPublished)
+
+  if (!isAuthorized) {
+    return redirect('/')
+  }
 
   const categories = await db.category.findMany({
     orderBy: {
