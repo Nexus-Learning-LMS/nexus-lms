@@ -20,6 +20,7 @@ export const getChapter = async ({
   userProgress: UserProgress | null
   purchase: Purchase | null
   isLocked: boolean
+  banner?: { variant: 'warning' | 'success' | 'warning2'; label: string } | null
 }> => {
   try {
     const purchase = await db.purchase.findUnique({
@@ -61,6 +62,7 @@ export const getChapter = async ({
     let attachments: Attachment[] = []
     let nextChapter: Chapter | null = null
     let userProgress = null
+    let banner: { variant: 'warning' | 'success' | 'warning2'; label: string } | null = null
 
     const hasPurchased = !!purchase
     let isLocked = !chapter.isFree && !hasPurchased
@@ -76,6 +78,7 @@ export const getChapter = async ({
       )
 
       const chapterIndexInPaidList = paidChapters.findIndex((c) => c.id === chapter.id)
+      const isChapterCompleted = allUserProgress.some((p) => p.chapterId === chapter.id && p.isCompleted)
 
       if (!chapter.isFree) {
         // If all paid chapters are complete, lock them all. Otherwise, apply window logic.
@@ -86,6 +89,38 @@ export const getChapter = async ({
             chapterIndexInPaidList < firstUncompletedIndex || chapterIndexInPaidList >= firstUncompletedIndex + 3
         }
       }
+      if (isLocked) {
+        if (isChapterCompleted) {
+          banner = {
+            variant: 'warning2',
+            label: 'You’ve finished this chapter, great job! It’s now locked as we move ahead — keep learning!',
+          }
+        } else {
+          const prerequisiteIndex = chapterIndexInPaidList - 3
+          if (prerequisiteIndex >= 0) {
+            const chapterToComplete = paidChapters[prerequisiteIndex]
+            if (chapterToComplete) {
+              banner = {
+                variant: 'warning2',
+                label: `Complete Chapter ${chapterToComplete.position}: “${chapterToComplete.title}” to unlock this one. Keep going!`,
+              }
+            }
+          }
+        }
+      }
+    } else if (isLocked) {
+      banner = {
+        variant: 'warning2',
+        label: "To watch this chapter, please enroll in the course by clicking 'Enroll Now' below!",
+      }
+    }
+
+    userProgress = await db.userProgress.findUnique({
+      where: { userId_chapterId: { userId, chapterId } },
+    })
+
+    if (userProgress?.isCompleted && !isLocked) {
+      banner = { variant: 'success', label: 'You already completed this chapter.' }
     }
 
     // Only fetch the video data if the chapter is not locked
@@ -122,6 +157,7 @@ export const getChapter = async ({
       userProgress,
       purchase,
       isLocked,
+      banner,
     }
   } catch (error) {
     console.log('[GET_CHAPTER]', error)
@@ -134,6 +170,7 @@ export const getChapter = async ({
       userProgress: null,
       purchase: null,
       isLocked: true,
+      banner: null,
     }
   }
 }

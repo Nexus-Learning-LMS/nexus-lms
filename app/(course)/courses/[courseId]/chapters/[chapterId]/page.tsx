@@ -26,23 +26,22 @@ const ChapterIdPage = async ({ params: paramsPromise }: ChapterIdPageProps) => {
     return redirect('/')
   }
 
-  const { chapter, course, muxData, attachments, nextChapter, userProgress, purchase, isLocked } = await getChapter({
-    userId,
-    chapterId: params.chapterId,
-    courseId: params.courseId,
-  })
+  const { chapter, course, muxData, attachments, nextChapter, userProgress, purchase, isLocked, banner } =
+    await getChapter({
+      userId,
+      chapterId: params.chapterId,
+      courseId: params.courseId,
+    })
 
   if (!chapter || !course) {
     return redirect('/')
   }
 
-  // const isLocked = !chapter.isFree && !purchase
   const completeOnEnd = !!purchase && !userProgress?.isCompleted
 
   return (
     <div>
-      {userProgress?.isCompleted && <Banner variant="success" label="You already completed this chapter." />}
-      {isLocked && <Banner variant="warning2" label="You need to purchase this course to watch this chapter." />}
+      {banner && <Banner variant={banner.variant} label={banner.label} />}
       <div className="flex flex-col max-w-4xl mx-auto pb-20">
         {muxData?.playbackId ? (
           <VideoPlayer
