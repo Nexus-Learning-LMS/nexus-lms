@@ -8,6 +8,7 @@ import { CourseCard } from '@/components/course-card'
 import { WhyNexusSection } from '../_components/why-nexus-section'
 import { OurTeamSection } from '../_components/our-team-section'
 import { getProgress } from '@/actions/get-progress'
+import { TestimonialsSection } from '../_components/testimonials-section'
 
 export default async function Home() {
   const { userId } = await auth()
@@ -100,6 +101,7 @@ export default async function Home() {
       </section>
 
       <WhyNexusSection />
+      <TestimonialsSection />
       <OurTeamSection />
     </div>
   )
