@@ -1,8 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-import { useEffect, useState } from 'react'
-import { Award, ClipboardCheck, HeartHandshake, PlayCircle, Users, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Award, ClipboardCheck, HeartHandshake, PlayCircle, Users, ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const features = [
@@ -76,6 +76,8 @@ const imageGridClasses = [
 export const WhyNexusSection = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [isPaused, setIsPaused] = useState(false)
+  const [hoveredImage, setHoveredImage] = useState<string | null>(null)
+  const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const handlePrev = () => {
     setCurrentImageIndex((prev) => (prev === 0 ? collageImages.length - 1 : prev - 1))
@@ -100,8 +102,49 @@ export const WhyNexusSection = () => {
     return () => clearInterval(interval)
   }, [isPaused, currentImageIndex]) // The empty dependency array ensures this effect runs only once on mount.
 
+  const handleMouseEnter = (imageSrc: string) => {
+    // Set a timer to show the pop-out after a short delay (e.g., 400ms)
+    hoverTimeoutRef.current = setTimeout(() => {
+      setHoveredImage(imageSrc)
+    }, 400)
+  }
+
+  const handleMouseLeave = () => {
+    // If the mouse leaves before the timer finishes, cancel the pop-out
+    if (hoverTimeoutRef.current) {
+      clearTimeout(hoverTimeoutRef.current)
+    }
+  }
+
   return (
     <section id="why-nexus" className="py-16 md:py-20 md:px-8 bg-white">
+      {hoveredImage && (
+        <div
+          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm"
+          onClick={() => setHoveredImage(null)}
+        >
+          <button
+            onClick={() => setHoveredImage(null)}
+            className="absolute top-4 right-4 text-white hover:text-slate-300 transition"
+          >
+            <X className="h-8 w-8" />
+          </button>
+
+          <div
+            className="relative w-full max-w-3xl aspect-video transition-all duration-300 ease-in-out scale-100 animate-in fade-in-0 zoom-in-95"
+            onMouseLeave={() => setHoveredImage(null)}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={hoveredImage}
+              alt="Enlarged view"
+              fill
+              className="object-contain rounded-lg"
+              sizes="(max-width: 768px) 100vw, 75vw"
+            />
+          </div>
+        </div>
+      )}
       <div className="container mx-auto px-6">
         <div className="text-center mb-12 md:mb-16 cursor-default">
           <h2 className="text-3xl md:text-4xl font-bold text-brand-dark-blue">Why Nexus Learning?</h2>
@@ -118,13 +161,21 @@ export const WhyNexusSection = () => {
             {/* Desktop Image Collage */}
             <div className="hidden md:grid grid-cols-[repeat(21,1fr)] grid-rows-[repeat(16,1fr)] gap-4 h-[530px]">
               {collageImages.map((image, index) => (
-                <div key={image.src} className={cn('rounded-lg overflow-hidden shadow-lg', imageGridClasses[index])}>
+                <div
+                  key={image.src}
+                  className={cn(
+                    'rounded-lg overflow-hidden shadow-lg relative transition-transform duration-300 hover:scale-105',
+                    imageGridClasses[index],
+                  )}
+                  onMouseEnter={() => handleMouseEnter(image.src)}
+                  onMouseLeave={handleMouseLeave}
+                >
                   <Image
                     src={image.src}
                     alt={image.alt}
-                    width={500}
-                    height={500}
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110 aspect-square"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover"
                   />
                 </div>
               ))}
