@@ -116,7 +116,7 @@ export const CourseProgressButton = ({
               one. Confirm by selecting Yes.
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="flex items-center space-x-2 my-4">
+          {/* <div className="flex items-center space-x-2 my-4">
             <Checkbox
               id="dont-show-again"
               checked={dontShowAgain}
@@ -128,7 +128,7 @@ export const CourseProgressButton = ({
             >
               Do not show this again
             </Label>
-          </div>
+          </div> */}
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={onConfirm}>Yes</AlertDialogAction>
