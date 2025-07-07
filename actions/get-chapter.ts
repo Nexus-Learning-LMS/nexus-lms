@@ -37,11 +37,10 @@ export const getChapter = async ({
     // When the timer expires, atomically increment the number of unlocked chapters.
     if (purchase?.unlocksAt && new Date(purchase.unlocksAt) <= new Date()) {
       try {
-        // This update only succeeds if the unlocksAt field hasn't been changed by another process.
         const updatedPurchase = await db.purchase.update({
           where: {
             id: purchase.id,
-            unlocksAt: purchase.unlocksAt, // Ensures atomicity
+            unlocksAt: purchase.unlocksAt,
           },
           data: {
             unlocksAt: null,
@@ -115,6 +114,43 @@ export const getChapter = async ({
         if (purchase.unlocksAt && chapterIndexInPaidList === windowEnd) {
           isTimerChapter = true
         }
+      }
+    }
+
+    // --- ADDED BANNER LOGIC ---
+    const isChapterCompleted = !!userProgress?.isCompleted
+
+    if (isChapterCompleted && !isLocked) {
+      banner = {
+        variant: 'success',
+        label: 'You have already completed this chapter.',
+      }
+    }
+
+    if (isLocked) {
+      if (!purchase) {
+        banner = {
+          variant: 'warning2',
+          label: "To watch this chapter, please enroll in the course by clicking 'Enroll Now' below!",
+        }
+      } else if (isChapterCompleted) {
+        banner = {
+          variant: 'warning2',
+          label: 'You have finished this chapter, great job! It’s now locked as we move ahead — keep learning!',
+        }
+      } else {
+        banner = {
+          variant: 'warning2',
+          label: 'This chapter is currently locked. Complete previous chapters in the course to unlock it.',
+        }
+      }
+    }
+
+    if (!isLocked && !isChapterCompleted && !chapter.isFree) {
+      banner = {
+        variant: 'info',
+        label:
+          'Before moving on, make sure you have understood the lecture and taken notes. Feel free to ask any questions at nexuslearning.team@gmail.com. Once you move ahead, you may lose access to this chapter — so take your time and learn well!',
       }
     }
 
