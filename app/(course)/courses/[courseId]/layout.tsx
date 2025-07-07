@@ -7,6 +7,7 @@ import { getProgress } from '@/actions/get-progress'
 import { CourseSidebar } from './_components/course-sidebar'
 import { CourseNavbar } from './_components/course-navbar'
 import { CourseMobileSidebar } from './_components/course-mobile-sidebar'
+import { Purchase } from '@prisma/client'
 
 interface CourseLayoutProps {
   children: React.ReactNode
@@ -16,12 +17,48 @@ interface CourseLayoutProps {
 }
 
 const CourseLayout = async ({ children, params: paramsPromise }: CourseLayoutProps) => {
-  // Await the promise to get the resolved params object
   const params = await paramsPromise
   const { userId } = await auth()
 
   if (!userId) {
     return redirect('/')
+  }
+
+  let purchase: Purchase | null = await db.purchase.findUnique({
+    where: {
+      userId_courseId: {
+        userId,
+        courseId: params.courseId,
+      },
+    },
+  })
+
+  // When the timer expires, atomically increment the number of unlocked chapters.
+  if (purchase?.unlocksAt && new Date(purchase.unlocksAt) <= new Date()) {
+    try {
+      // This update only succeeds if the unlocksAt field hasn't been changed by another process.
+      const updatedPurchase = await db.purchase.update({
+        where: {
+          id: purchase.id,
+          unlocksAt: purchase.unlocksAt, // Ensures atomicity
+        },
+        data: {
+          unlocksAt: null,
+          unlockedChapterCount: {
+            increment: 1,
+          },
+        },
+      })
+      purchase = updatedPurchase
+    } catch (error) {
+      // If the update failed (likely due to a race condition), fetch the latest record.
+      const freshPurchase = await db.purchase.findUnique({
+        where: { id: purchase.id },
+      })
+      if (freshPurchase) {
+        purchase = freshPurchase
+      }
+    }
   }
 
   const course = await db.course.findUnique({
@@ -44,11 +81,6 @@ const CourseLayout = async ({ children, params: paramsPromise }: CourseLayoutPro
           position: 'asc',
         },
       },
-      purchases: {
-        where: {
-          userId,
-        },
-      },
     },
   })
 
@@ -57,30 +89,25 @@ const CourseLayout = async ({ children, params: paramsPromise }: CourseLayoutPro
   }
 
   const progressCount = await getProgress(userId, course.id)
-  const hasPurchased = course.purchases.length > 0
 
-  // Apply the rolling window logic
-  if (hasPurchased) {
-    const paidChapters = course.chapters.filter((chapter) => !chapter.isFree)
-
-    // Find the index of the first paid chapter that is NOT completed.
-    // This is the anchor for our rolling window.
-    const firstUncompletedIndex = paidChapters.findIndex((chapter) => !chapter.userProgress?.[0]?.isCompleted)
+  const WINDOW_SIZE = 3
+  if (purchase) {
+    const paidChapters = course.chapters.filter((c) => !c.isFree)
+    const unlockCount = purchase.unlockedChapterCount ?? WINDOW_SIZE
+    const windowEnd = unlockCount
+    const windowStart = Math.max(0, windowEnd - WINDOW_SIZE)
 
     course.chapters.forEach((chapter) => {
       if (!chapter.isFree) {
-        const chapterIndexInPaidList = paidChapters.findIndex((c) => c.id === chapter.id)
-
-        // A chapter is locked if its index is outside the 3-chapter window
-        // that starts at the first uncompleted chapter.
-        const isLocked =
-          firstUncompletedIndex !== -1 &&
-          (chapterIndexInPaidList < firstUncompletedIndex || chapterIndexInPaidList >= firstUncompletedIndex + 3)
-
-        ;(chapter as any).isLocked = isLocked
+        const chapterIndex = paidChapters.findIndex((c) => c.id === chapter.id)
+        ;(chapter as any).isLocked = chapterIndex < windowStart || chapterIndex >= windowEnd
       } else {
-        ;(chapter as any).isLocked = false // Free chapters are never locked
+        ;(chapter as any).isLocked = false
       }
+    })
+  } else {
+    course.chapters.forEach((chapter) => {
+      ;(chapter as any).isLocked = !chapter.isFree
     })
   }
 

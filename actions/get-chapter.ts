@@ -13,17 +13,19 @@ export const getChapter = async ({
   chapterId,
 }: GetChapterProps): Promise<{
   chapter: Chapter | null
-  course: (Course & { chapters: Chapter[] }) | null
+  course: (Course & { chapters: (Chapter & { userProgress: UserProgress[] })[] }) | null
   muxData: MuxData | null
   attachments: Attachment[]
   nextChapter: Chapter | null
   userProgress: UserProgress | null
   purchase: Purchase | null
   isLocked: boolean
+  unlocksAt?: Date | null
+  isTimerChapter: boolean
   banner?: { variant: 'warning' | 'success' | 'warning2' | 'info'; label: string } | null
 }> => {
   try {
-    const purchase = await db.purchase.findUnique({
+    let purchase = await db.purchase.findUnique({
       where: {
         userId_courseId: {
           userId,
@@ -32,127 +34,100 @@ export const getChapter = async ({
       },
     })
 
+    // When the timer expires, atomically increment the number of unlocked chapters.
+    if (purchase?.unlocksAt && new Date(purchase.unlocksAt) <= new Date()) {
+      try {
+        // This update only succeeds if the unlocksAt field hasn't been changed by another process.
+        const updatedPurchase = await db.purchase.update({
+          where: {
+            id: purchase.id,
+            unlocksAt: purchase.unlocksAt, // Ensures atomicity
+          },
+          data: {
+            unlocksAt: null,
+            unlockedChapterCount: {
+              increment: 1,
+            },
+          },
+        })
+        purchase = updatedPurchase
+      } catch (error) {
+        // If the update failed (likely due to a race condition), fetch the latest record.
+        const freshPurchase = await db.purchase.findUnique({
+          where: { id: purchase.id },
+        })
+        if (freshPurchase) {
+          purchase = freshPurchase
+        }
+      }
+    }
+
     const course = await db.course.findUnique({
       where: {
         isPublished: true,
         id: courseId,
       },
       include: {
-        // Use include to get all course fields
         chapters: {
-          // We still need all chapters to calculate the window
           where: { isPublished: true },
           orderBy: { position: 'asc' },
+          include: {
+            userProgress: {
+              where: { userId },
+            },
+          },
         },
       },
     })
 
     const chapter = await db.chapter.findUnique({
-      where: {
-        id: chapterId,
-        isPublished: true,
-      },
+      where: { id: chapterId, isPublished: true },
     })
 
     if (!chapter || !course) {
       throw new Error('Chapter or course not found')
     }
 
-    let muxData = null
-    let attachments: Attachment[] = []
-    let nextChapter: Chapter | null = null
-    let userProgress = null
+    const userProgress = await db.userProgress.findUnique({
+      where: {
+        userId_chapterId: {
+          userId,
+          chapterId,
+        },
+      },
+    })
+
+    let isLocked = !chapter.isFree && !purchase
+    let isTimerChapter = false
+    const WINDOW_SIZE = 3
     let banner: { variant: 'warning' | 'success' | 'warning2' | 'info'; label: string } | null = null
 
-    const hasPurchased = !!purchase
-    let isLocked = !chapter.isFree && !hasPurchased
-
-    if (hasPurchased) {
-      const allUserProgress = await db.userProgress.findMany({
-        where: { userId, chapterId: { in: course.chapters.map((c) => c.id) } },
-      })
-
+    if (purchase) {
       const paidChapters = course.chapters.filter((c) => !c.isFree)
-      const firstUncompletedIndex = paidChapters.findIndex(
-        (c) => !allUserProgress.some((p) => p.chapterId === c.id && p.isCompleted),
-      )
+      const unlockCount = purchase.unlockedChapterCount ?? WINDOW_SIZE
+      const windowEnd = unlockCount
+      const windowStart = Math.max(0, windowEnd - WINDOW_SIZE)
 
       const chapterIndexInPaidList = paidChapters.findIndex((c) => c.id === chapter.id)
-      const isChapterCompleted = allUserProgress.some((p) => p.chapterId === chapter.id && p.isCompleted)
 
       if (!chapter.isFree) {
-        // If all paid chapters are complete, lock them all. Otherwise, apply window logic.
-        if (firstUncompletedIndex === -1) {
-          isLocked = true
-        } else {
-          isLocked =
-            chapterIndexInPaidList < firstUncompletedIndex || chapterIndexInPaidList >= firstUncompletedIndex + 3
+        isLocked = chapterIndexInPaidList < windowStart || chapterIndexInPaidList >= windowEnd
+        if (purchase.unlocksAt && chapterIndexInPaidList === windowEnd) {
+          isTimerChapter = true
         }
-      }
-
-      if (isLocked) {
-        if (isChapterCompleted) {
-          banner = {
-            variant: 'warning2',
-            label: 'You have finished this chapter, great job! It’s now locked as we move ahead — keep learning!',
-          }
-        } else {
-          const prerequisiteIndex = chapterIndexInPaidList - 3
-          if (prerequisiteIndex >= 0) {
-            const chapterToComplete = paidChapters[prerequisiteIndex]
-            if (chapterToComplete) {
-              banner = {
-                variant: 'warning2',
-                label: `Complete Chapter ${chapterToComplete.position}: “${chapterToComplete.title}” to unlock this one. Keep going!`,
-              }
-            }
-          }
-        }
-      } else if (!isChapterCompleted && !chapter.isFree) {
-        banner = {
-          variant: 'info',
-          label:
-            'Before moving on, make sure you have understood the lecture and taken notes. Feel free to ask any questions at nexuslearning.team@gmail.com. Once you move ahead, you may lose access to this chapter — so take your time and learn well!',
-        }
-      }
-    } else if (isLocked) {
-      banner = {
-        variant: 'warning2',
-        label: "To watch this chapter, please enroll in the course by clicking 'Enroll Now' below!",
       }
     }
 
-    userProgress = await db.userProgress.findUnique({
-      where: { userId_chapterId: { userId, chapterId } },
-    })
-
-    if (userProgress?.isCompleted && !isLocked) {
-      banner = { variant: 'success', label: 'You already completed this chapter.' }
-    }
-
-    // Only fetch the video data if the chapter is not locked
+    let muxData = null
+    let attachments: Attachment[] = []
     if (!isLocked) {
-      muxData = await db.muxData.findUnique({
-        where: { chapterId: chapterId },
-      })
-
-      attachments = await db.attachment.findMany({
-        where: { courseId: courseId },
-      })
+      muxData = await db.muxData.findUnique({ where: { chapterId } })
+      attachments = await db.attachment.findMany({ where: { courseId } })
     }
 
-    // Find the next chapter regardless of lock status for UI purposes
-    nextChapter = await db.chapter.findFirst({
-      where: {
-        courseId: courseId,
-        isPublished: true,
-        position: { gt: chapter.position },
-      },
+    const nextChapter = await db.chapter.findFirst({
+      where: { courseId, isPublished: true, position: { gt: chapter.position } },
       orderBy: { position: 'asc' },
-    })
-
-    userProgress = await db.userProgress.findUnique({
-      where: { userId_chapterId: { userId, chapterId } },
     })
 
     return {
@@ -164,6 +139,8 @@ export const getChapter = async ({
       userProgress,
       purchase,
       isLocked,
+      unlocksAt: purchase?.unlocksAt,
+      isTimerChapter,
       banner,
     }
   } catch (error) {
@@ -177,6 +154,7 @@ export const getChapter = async ({
       userProgress: null,
       purchase: null,
       isLocked: true,
+      isTimerChapter: false,
       banner: null,
     }
   }

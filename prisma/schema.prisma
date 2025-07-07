@@ -7,10 +7,10 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
-
 
 model Course {
   id String @id @default(uuid())
@@ -109,6 +109,9 @@ model Purchase {
 
   courseId String
   course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  unlocksAt DateTime?
+  unlockedChapterCount  Int?      @default(3)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt()
