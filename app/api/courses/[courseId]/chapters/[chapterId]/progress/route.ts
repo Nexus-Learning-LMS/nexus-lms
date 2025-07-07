@@ -3,7 +3,11 @@ import { NextResponse } from 'next/server'
 
 import { db } from '@/lib/db'
 
-export async function PUT(req: Request, { params }: { params: { courseId: string; chapterId: string } }) {
+export async function PUT(
+  req: Request,
+  { params: paramsPromise }: { params: Promise<{ courseId: string; chapterId: string }> },
+) {
+  const params = await paramsPromise
   try {
     const { userId } = await auth()
     const { isCompleted } = await req.json()
@@ -18,7 +22,6 @@ export async function PUT(req: Request, { params }: { params: { courseId: string
       create: { userId, chapterId: params.chapterId, isCompleted },
     })
 
-    // --- NEW TIMER TRIGGER LOGIC ---
     if (isCompleted) {
       try {
         const purchase = await db.purchase.findUnique({
@@ -56,7 +59,7 @@ export async function PUT(req: Request, { params }: { params: { courseId: string
 
         // If the count of completed chapters matches the number required, the window is clear.
         if (completedRequiredChapters === requiredChapterIds.length) {
-          const twentyFourHoursFromNow = new Date(Date.now() + 24* 60* 60 * 1000)
+          const twentyFourHoursFromNow = new Date(Date.now() + 24 * 60 * 60 * 1000)
           await db.purchase.update({
             where: { id: purchase.id },
             data: { unlocksAt: twentyFourHoursFromNow },
@@ -66,7 +69,6 @@ export async function PUT(req: Request, { params }: { params: { courseId: string
         console.log('[TIMER_TRIGGER_ERROR]', error)
       }
     }
-    // --- END OF NEW LOGIC ---
 
     return NextResponse.json({ success: true })
   } catch (error) {
