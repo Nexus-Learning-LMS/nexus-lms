@@ -2,6 +2,7 @@ import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 
 import { db } from '@/lib/db'
+import { isTeacher } from '@/lib/teacher'
 
 export async function PATCH(
   req: Request,
@@ -11,18 +12,19 @@ export async function PATCH(
   try {
     const { userId } = await auth()
 
-    if (!userId) {
+    if (!userId || !isTeacher(userId)) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const ownCourse = await db.course.findUnique({
-      where: {
-        id: params.courseId,
-        userId,
-      },
+    const course = await db.course.findUnique({
+      where: { id: params.courseId },
     })
 
-    if (!ownCourse) {
+    if (!course) {
+      return new NextResponse('Not Found', { status: 404 })
+    }
+
+    if (course.userId !== userId && !(isTeacher(userId) && course.isPublished)) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
@@ -33,16 +35,6 @@ export async function PATCH(
       },
     })
 
-    // 1. The query for muxData is no longer needed for this validation.
-    /*
-    const muxData = await db.muxData.findUnique({
-      where: {
-        chapterId: params.chapterId,
-      },
-    })
-    */
-
-    // 2. The '!muxData' check has been removed from this 'if' condition.
     if (!chapter || !chapter.title || !chapter.description || !chapter.videoUrl) {
       return new NextResponse('Missing required fields', { status: 400 })
     }

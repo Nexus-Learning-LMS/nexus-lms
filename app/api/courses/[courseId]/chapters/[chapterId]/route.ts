@@ -3,6 +3,7 @@ import { auth } from '@clerk/nextjs/server'
 import { NextResponse } from 'next/server'
 
 import { db } from '@/lib/db'
+import { isTeacher } from '@/lib/teacher'
 
 const { Video } = new Mux(process.env.MUX_TOKEN_ID!, process.env.MUX_TOKEN_SECRET!)
 
@@ -14,18 +15,19 @@ export async function DELETE(
   try {
     const { userId } = await auth()
 
-    if (!userId) {
+    if (!userId || !isTeacher(userId)) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const ownCourse = await db.course.findUnique({
-      where: {
-        id: params.courseId,
-        userId,
-      },
+    const course = await db.course.findUnique({
+      where: { id: params.courseId },
     })
 
-    if (!ownCourse) {
+    if (!course) {
+      return new NextResponse('Not Found', { status: 404 })
+    }
+
+    if (course.userId !== userId && !(isTeacher(userId) && course.isPublished)) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
@@ -97,18 +99,19 @@ export async function PATCH(
     const { userId } = await auth()
     const { isPublished, playbackId, assetId, videoUrl, ...values } = await req.json()
 
-    if (!userId) {
+    if (!userId || !isTeacher(userId)) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const ownCourse = await db.course.findUnique({
-      where: {
-        id: params.courseId,
-        userId,
-      },
+    const course = await db.course.findUnique({
+      where: { id: params.courseId },
     })
 
-    if (!ownCourse) {
+    if (!course) {
+      return new NextResponse('Not Found', { status: 404 })
+    }
+
+    if (course.userId !== userId && !(isTeacher(userId) && course.isPublished)) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 

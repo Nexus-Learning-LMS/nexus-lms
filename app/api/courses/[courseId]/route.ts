@@ -12,14 +12,13 @@ export async function DELETE(req: Request, { params: paramsPromise }: { params: 
   try {
     const { userId } = await auth()
 
-    if (!userId) {
+    if (!userId || !isTeacher(userId)) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
     const course = await db.course.findUnique({
       where: {
         id: params.courseId,
-        userId: userId,
       },
       include: {
         chapters: {
@@ -32,6 +31,10 @@ export async function DELETE(req: Request, { params: paramsPromise }: { params: 
 
     if (!course) {
       return new NextResponse('Not found', { status: 404 })
+    }
+
+    if (course.userId !== userId && !(isTeacher(userId) && course.isPublished)) {
+      return new NextResponse('Unauthorized', { status: 401 })
     }
 
     for (const chapter of course.chapters) {
@@ -60,7 +63,7 @@ export async function PATCH(req: Request, { params: paramsPromise }: { params: P
     const { courseId } = params
     const values = await req.json()
 
-    if (!userId) {
+    if (!userId || !isTeacher(userId)) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
