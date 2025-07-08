@@ -5,11 +5,12 @@ import { db } from '@/lib/db'
 
 import { DataTable } from './_components/data-table'
 import { columns } from './_components/columns'
+import { isTeacher } from '@/lib/teacher'
 
 const CoursesPage = async () => {
   const { userId } = await auth()
 
-  if (!userId) {
+  if (!userId || !isTeacher(userId)) {
     return redirect('/')
   }
 

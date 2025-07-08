@@ -1,14 +1,14 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { EnrollmentClient } from './_components/enrollment-client'
+import { isTeacher } from '@/lib/teacher'
 
-const EnrollmentsPage = () => {
-//     const { sessionClaims } = auth()
+const EnrollmentsPage = async () => {
+  const { userId } = await auth()
 
-//   Protect this page to ensure only admins can access it
-//     if (sessionClaims?.metadata?.role !== 'admin') {
-//       redirect('/')
-//     }
+  if (!userId || !isTeacher(userId)) {
+    return redirect('/')
+  }
 
   return (
     <div className="p-6">
