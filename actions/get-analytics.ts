@@ -1,57 +1,62 @@
-import { db } from "@/lib/db";
-import { Course, Purchase } from "@prisma/client";
+import { db } from '@/lib/db'
+import { Course, Purchase } from '@prisma/client'
+import { clerkClient } from '@clerk/nextjs/server'
 
 type PurchaseWithCourse = Purchase & {
-  course: Course;
-};
+  course: Course
+}
 
 const groupByCourse = (purchases: PurchaseWithCourse[]) => {
-  const grouped: { [courseTitle: string]: number } = {};
-  
-  purchases.forEach((purchase) => {
-    const courseTitle = purchase.course.title;
-    if (!grouped[courseTitle]) {
-      grouped[courseTitle] = 0;
-    }
-    grouped[courseTitle] += purchase.course.price!;
-  });
+  const grouped: { [courseTitle: string]: number } = {}
 
-  return grouped;
-};
+  purchases.forEach((purchase) => {
+    const courseTitle = purchase.course.title
+    if (!grouped[courseTitle]) {
+      grouped[courseTitle] = 0
+    }
+    // Instead of summing the price, we now count the number of enrollments.
+    grouped[courseTitle] += 1
+  })
+
+  return grouped
+}
 
 export const getAnalytics = async (userId: string) => {
   try {
     const purchases = await db.purchase.findMany({
-      where: {
-        course: {
-          userId: userId
-        }
-      },
       include: {
         course: true,
-      }
-    });
+      },
+    })
 
-    const groupedEarnings = groupByCourse(purchases);
-    const data = Object.entries(groupedEarnings).map(([courseTitle, total]) => ({
+    const groupedData = groupByCourse(purchases)
+    const data = Object.entries(groupedData).map(([courseTitle, total]) => ({
       name: courseTitle,
       total: total,
-    }));
+    }))
 
-    const totalRevenue = data.reduce((acc, curr) => acc + curr.total, 0);
-    const totalSales = purchases.length;
+    // --- START OF NEW METRICS ---
+    const totalSales = purchases.length
+    const clerk = await clerkClient()
+    const totalUsers = await clerk.users.getCount()
+    const totalCourses = await db.course.count({
+      where: { isPublished: true },
+    })
+    // --- END OF NEW METRICS ---
 
     return {
       data,
-      totalRevenue,
       totalSales,
+      totalUsers,
+      totalCourses,
     }
   } catch (error) {
-    console.log("[GET_ANALYTICS]", error);
+    console.log('[GET_ANALYTICS]', error)
     return {
       data: [],
-      totalRevenue: 0,
       totalSales: 0,
+      totalUsers: 0,
+      totalCourses: 0,
     }
   }
 }
