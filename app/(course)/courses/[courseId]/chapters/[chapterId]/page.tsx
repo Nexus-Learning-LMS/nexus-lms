@@ -32,7 +32,6 @@ const ChapterIdPage = async ({ params: paramsPromise }: ChapterIdPageProps) => {
     chapter,
     course,
     muxData,
-    attachments,
     nextChapter,
     userProgress,
     purchase,
@@ -119,24 +118,6 @@ const ChapterIdPage = async ({ params: paramsPromise }: ChapterIdPageProps) => {
               <p className="text-sm text-slate-500 italic px-4 py-2">N/A</p>
             )}
           </div>
-          {!!attachments.length && (
-            <>
-              <Separator />
-              <div className="p-4">
-                {attachments.map((attachment) => (
-                  <a
-                    href={attachment.url}
-                    target="_blank"
-                    key={attachment.id}
-                    className="flex items-center p-3 w-full bg-sky-200 border text-sky-700 rounded-md hover:underline"
-                  >
-                    <File />
-                    <p className="line-clamp-1">{attachment.name}</p>
-                  </a>
-                ))}
-              </div>
-            </>
-          )}
         </div>
       </div>
     </div>

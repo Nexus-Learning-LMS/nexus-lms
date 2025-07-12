@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import { Attachment, Chapter, Course, MuxData, Purchase, UserProgress } from '@prisma/client'
+import { Chapter, Course, MuxData, Purchase, UserProgress } from '@prisma/client'
 
 interface GetChapterProps {
   userId: string
@@ -15,7 +15,6 @@ export const getChapter = async ({
   chapter: Chapter | null
   course: (Course & { chapters: (Chapter & { userProgress: UserProgress[] })[] }) | null
   muxData: MuxData | null
-  attachments: Attachment[]
   nextChapter: Chapter | null
   userProgress: UserProgress | null
   purchase: Purchase | null
@@ -148,14 +147,12 @@ export const getChapter = async ({
     }
 
     const muxData = isLocked ? null : chapter.muxData ?? null;
-    let attachments: Attachment[] = []
     const nextChapter = course.chapters.find((c) => c.position === chapter.position + 1) || null
 
     return {
       chapter,
       course,
       muxData,
-      attachments,
       nextChapter,
       userProgress,
       purchase,
@@ -170,7 +167,6 @@ export const getChapter = async ({
       chapter: null,
       course: null,
       muxData: null,
-      attachments: [],
       nextChapter: null,
       userProgress: null,
       purchase: null,
