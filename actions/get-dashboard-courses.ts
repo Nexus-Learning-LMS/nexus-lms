@@ -1,5 +1,4 @@
 import { Category, Chapter, Course } from '@prisma/client'
-
 import { db } from '@/lib/db'
 import { getProgress } from '@/actions/get-progress'
 
@@ -34,15 +33,29 @@ export const getDashboardCourses = async (userId: string): Promise<DashboardCour
       },
     })
 
-    const courses = purchasedCourses.map((purchase) => purchase.course) as CourseWithProgressWithCategory[]
+    // 1. Remove the incorrect type assertion. Let TypeScript infer the type from Prisma.
+    const courses = purchasedCourses.map((purchase) => purchase.course) as (Course & {
+      category: Category | null
+      chapters: Chapter[]
+    })[]
 
+    // 2. Create a new array to hold the final, correctly typed objects.
+    const coursesWithProgress: CourseWithProgressWithCategory[] = []
+
+    // 3. Iterate and build the new array with the `progress` property included.
     for (let course of courses) {
-      const progress = await getProgress(userId, course.id)
-      course['progress'] = progress
+      if (course.category) {
+        const progress = await getProgress(userId, course.id)
+        coursesWithProgress.push({
+          ...course,
+          category: course.category,
+          progress: progress,
+        })
+      }
     }
 
-    const completedCourses = courses.filter((course) => course.progress === 100)
-    const coursesInProgress = courses.filter((course) => (course.progress ?? 0) < 100)
+    const completedCourses = coursesWithProgress.filter((course) => course.progress === 100)
+    const coursesInProgress = coursesWithProgress.filter((course) => (course.progress ?? 0) < 100)
 
     return {
       completedCourses,

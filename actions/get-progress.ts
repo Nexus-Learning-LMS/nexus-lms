@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
+import { cache } from 'react'
 
-export const getProgress = async (userId: string, courseId: string): Promise<number> => {
+export const getProgress = cache(async (userId: string, courseId: string): Promise<number> => {
   try {
     const publishedChapters = await db.chapter.findMany({
       where: {
@@ -31,4 +32,4 @@ export const getProgress = async (userId: string, courseId: string): Promise<num
     console.log('[GET_PROGRESS]', error)
     return 0
   }
-}
+})
