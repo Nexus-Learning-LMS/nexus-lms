@@ -1,13 +1,23 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import dynamic from 'next/dynamic'
 
 import { db } from '@/lib/db'
 import { SearchInput } from '@/components/search-input'
 import { getCourses } from '@/actions/get-courses'
-import { CoursesList } from '@/components/courses-list'
-
 import { Categories } from './_components/categories'
+import { CourseCardSkeleton } from '@/components/course-card-skeleton'
 
+const CoursesList = dynamic(() => import('@/components/courses-list').then((mod) => mod.CoursesList), {
+  // Render a skeleton loader while the component is loading
+  loading: () => (
+    <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4 gap-4">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <CourseCardSkeleton key={i} />
+      ))}
+    </div>
+  ),
+})
 interface SearchPageProps {
   searchParams: Promise<{
     title: string

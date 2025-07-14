@@ -2,13 +2,18 @@ import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
+import dynamic from 'next/dynamic'
 
 import { db } from '@/lib/db'
 import { CourseCard } from '@/components/course-card'
-import { WhyNexusSection } from '../_components/why-nexus-section'
-import { OurTeamSection } from '../_components/our-team-section'
 import { getProgress } from '@/actions/get-progress'
-import { TestimonialsSection } from '../_components/testimonials-section'
+
+// Lazy-loading components to improve initial load performance
+const WhyNexusSection = dynamic(() => import('../_components/why-nexus-section').then((mod) => mod.WhyNexusSection))
+const OurTeamSection = dynamic(() => import('../_components/our-team-section').then((mod) => mod.OurTeamSection))
+const TestimonialsSection = dynamic(() =>
+  import('../_components/testimonials-section').then((mod) => mod.TestimonialsSection),
+)
 
 export default async function Home() {
   const { userId } = await auth()

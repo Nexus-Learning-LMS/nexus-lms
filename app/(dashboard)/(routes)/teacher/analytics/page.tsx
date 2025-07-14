@@ -1,11 +1,21 @@
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
+import dynamic from 'next/dynamic'
 
 import { getAnalytics } from '@/actions/get-analytics'
 import { isTeacher } from '@/lib/teacher'
+import { DataCardSkeleton } from './_components/data-card-skeleton'
+import { ChartSkeleton } from './_components/charts-skeleton'
 
-import { DataCard } from './_components/data-card'
-import { Chart } from './_components/chart'
+const DataCard = dynamic(() => import('./_components/data-card').then((mod) => mod.DataCard), {
+  loading: () => <DataCardSkeleton />,
+  ssr: false,
+})
+
+const Chart = dynamic(() => import('./_components/chart').then((mod) => mod.Chart), {
+  loading: () => <ChartSkeleton />,
+  ssr: false,
+})
 
 const AnalyticsPage = async () => {
   const { userId } = await auth()
