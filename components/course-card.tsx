@@ -50,10 +50,10 @@ export const CourseCard = ({
           <p className="text-xs text-slate-700">{category}</p>
           <div className="text-lg md:text-base font-bold transition line-clamp-2 mt-1">{title}</div>
           <div className="my-3 flex items-center gap-x-2 text-sm text-slate-900">
-            <IconBadge size="sm" icon={BookOpen} />
+            {/* <IconBadge size="sm" icon={BookOpen} />
             <span>
               {chaptersLength} {chaptersLength === 1 ? 'Chapter' : 'Chapters'}
-            </span>
+            </span> */}
           </div>
 
           <div className="flex-grow" />
