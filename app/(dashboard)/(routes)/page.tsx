@@ -25,7 +25,7 @@ export default async function Home() {
       purchases: userId ? { where: { userId } } : false,
     },
     orderBy: { createdAt: 'desc' },
-    take: 4,
+    // take: 4,
   })
   const coursesWithProgress = userId
     ? await Promise.all(
